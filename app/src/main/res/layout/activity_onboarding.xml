@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_aris_login"
+    tools:context=".LoginActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <!-- Top Logo Section -->
+            <LinearLayout
+                android:id="@+id/logoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/logoImage"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:contentDescription="A.R.I.S logo"
+                    android:src="@drawable/ic_frozen_creature" />
+
+                <!-- Text is in the image, but the provided image has a specific styling for A.R.I.S -->
+                <TextView
+                    android:id="@+id/welcomeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="A.R.I.S"
+                    android:textColor="#E0F7FA"
+                    android:textSize="48sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="ARTIFICIAL RESPONSIVE INTELLIGENCE SYSTEM"
+                    android:textColor="#90A4AE"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.15" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <View
+                        android:layout_width="32dp"
+                        android:layout_height="1dp"
+                        android:background="#406080" />
+                    <TextView
+                        android:id="@+id/inviteMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:text="Command Your World"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp" />
+                    <View
+                        android:layout_width="32dp"
+                        android:layout_height="1dp"
+                        android:background="#406080" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Bottom Onboarding Card -->
+            <LinearLayout
+                android:id="@+id/loginCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/logoContainer"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Google Sign-In Button inside login card -->
+                <LinearLayout
+                    android:id="@+id/googleSignInButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_aris_btn_white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_google" />
+                        
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Continue with Google"
+                        android:textColor="#111111"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                        
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_right_black" />
+                </LinearLayout>
+
+                <!-- Divider -->
+                <LinearLayout
+                    android:id="@+id/dividerContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="24dp"
+                        android:layout_height="2dp"
+                        android:background="#00B0FF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:text="OR"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp" />
+
+                    <View
+                        android:layout_width="24dp"
+                        android:layout_height="2dp"
+                        android:background="#2979FF" />
+                </LinearLayout>
+
+                <!-- Inputs and Controls Container -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Normal email field / standard flow -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="@drawable/bg_aris_input"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+                            
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_mail_outline" />
+                                
+                            <EditText
+                                android:id="@+id/emailInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="12dp"
+                                android:background="@null"
+                                android:hint="Email Address"
+                                android:inputType="textEmailAddress"
+                                android:textColor="#FFFFFF"
+                                android:textColorHint="#8090A0"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <!-- OTP & Register Fields -->
+                        <EditText
+                            android:id="@+id/otpInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/bg_aris_input"
+                            android:hint="Enter OTP"
+                            android:inputType="number"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8090A0"
+                            android:textSize="16sp"
+                            android:visibility="gone" />
+
+                        <EditText
+                            android:id="@+id/usernameInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/bg_aris_input"
+                            android:hint="Enter your name"
+                            android:inputType="textPersonName"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#8090A0"
+                            android:textSize="16sp"
+                            android:visibility="gone" />
+
+                        <!-- Buttons on the main screen -->
+                        <LinearLayout
+                            android:id="@+id/emailSendOtpButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="24dp"
+                            android:background="@drawable/bg_aris_btn_gradient"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_lock_outline" />
+                                
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Send Verification Code"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                                
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_forward" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/otpVerifyButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:layout_marginTop="24dp"
+                            android:background="@drawable/bg_aris_btn_gradient"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:visibility="gone">
+                            
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_lock_outline" />
+                                
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="Verify OTP"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+                                
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_forward" />
+                        </LinearLayout>
+                        
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+                            
+                            <TextView
+                                android:id="@+id/demoSignInButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Explore Demo"
+                                android:textColor="#64B5F6"
+                                android:textSize="16sp"
+                                android:clickable="true"
+                                android:focusable="true" />
+                                
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="8dp"
+                                android:src="@drawable/ic_arrow_right"
+                                app:tint="#64B5F6" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </FrameLayout>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_shield_check" />
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Your data is secure with end-to-end encryption"
+                        android:textColor="#506070"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/loginCard"
+                android:gravity="center"
+                android:text="Terms of Service  |  Privacy Policy"
+                android:textColor="#4285F4"
+                android:textSize="14sp" />
+                
+        </RelativeLayout>
+    </ScrollView>
+
+    <!-- Overlay Loader -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/loadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Signing you in..."
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+</RelativeLayout>

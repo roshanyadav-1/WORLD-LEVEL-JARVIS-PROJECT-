@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/axel_background"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@color/axel_border" />
+
+    <!-- Checkout Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aris Premium Checkout"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Secure, end-to-end sandbox payment"
+                android:textColor="@color/axel_text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/payment_price_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/pro_badge_background"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="₹399.00"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Payment Tab Selector -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/pricing_card_background"
+        android:orientation="horizontal"
+        android:padding="3dp">
+
+        <Button
+            android:id="@+id/tab_card"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/purchase_button_background"
+            android:text="💳 Card"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/tab_upi"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="⚡ UPI / QR"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/tab_sandbox"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="🛠 Sandbox"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Main Payment Container -->
+    <FrameLayout
+        android:id="@+id/payment_content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="220dp">
+
+        <!-- Card Section -->
+        <LinearLayout
+            android:id="@+id/container_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Card Details"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <EditText
+                    android:id="@+id/et_card_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/input_box_background"
+                    android:hint="0000 0000 0000 0000"
+                    android:textColorHint="@color/axel_text_secondary"
+                    android:inputType="phone"
+                    android:maxLength="19"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_card_brand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:text="CARD"
+                    android:textColor="@color/accent"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_card_expiry"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_box_background"
+                    android:hint="MM/YY"
+                    android:textColorHint="@color/axel_text_secondary"
+                    android:inputType="phone"
+                    android:maxLength="5"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/et_card_cvv"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_box_background"
+                    android:hint="CVV"
+                    android:textColorHint="@color/axel_text_secondary"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/et_card_name"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/input_box_background"
+                android:hint="Cardholder Name"
+                android:textColorHint="@color/axel_text_secondary"
+                android:inputType="textPersonName"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_pay_card"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/purchase_button_background"
+                android:text="🔒 Pay Unlocked"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- UPI Sections -->
+        <LinearLayout
+            android:id="@+id/container_upi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="Scan QR code using any UPI App"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_upi_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Refresh in 10:00"
+                android:textColor="@color/accent"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Custom Built QR Code Representation -->
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginBottom="12dp"
+                android:background="#FFFFFF"
+                android:padding="8dp">
+
+                <!-- Drawn Grid lines mimicking a real QR Code -->
+                <ImageView
+                    android:id="@+id/iv_qrcode"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/pro"
+                    android:contentDescription="UPI Code" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="UPI ID: aris.premium@upi"
+                android:textColor="@color/axel_text_secondary"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_pay_upi"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/purchase_button_background"
+                android:text="✓ Confirms Payment scanned"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Sandbox Section -->
+        <LinearLayout
+            android:id="@+id/container_sandbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Developer Test bypass tool"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:text="Use this mode to bypass play store configurations. It instantly registers user as Pro in Firestore which updates premium tools seamlessly."
+                android:textColor="@color/axel_text_secondary"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_pay_sandbox"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/purchase_button_background"
+                android:text="⚡ Unlocks premium immediately"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- OTP Input Verification Dialog -->
+        <LinearLayout
+            android:id="@+id/container_otp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="3D Secure verification code"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="We sent verification OTP code: 123456"
+                android:textColor="@color/accent"
+                android:textSize="11sp" />
+
+            <EditText
+                android:id="@+id/et_otp_code"
+                android:layout_width="160dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/input_box_background"
+                android:gravity="center"
+                android:hint="------"
+                android:textColorHint="@color/axel_text_secondary"
+                android:inputType="number"
+                android:maxLength="6"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_otp_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/purchase_button_background"
+                android:text="Verify &amp; Subscribe"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Dynamic Loader Layer -->
+        <LinearLayout
+            android:id="@+id/container_loader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:indeterminateTint="@color/accent" />
+
+            <TextView
+                android:id="@+id/tv_loader_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Authorizing purchase..."
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="wake_up_aris"
+        android:enabled="true"
+        android:icon="@drawable/ic_mic"
+        android:shortcutShortLabel="@string/shortcut_wake_up_short"
+        android:shortcutLongLabel="@string/shortcut_wake_up_long">
+        <intent
+            android:action="com.aris.voice.WAKE_UP_ARIS"
+            android:targetPackage="com.aris.voice"
+            android:targetClass="com.aris.voice.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

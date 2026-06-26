@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1234567890",
+    "project_id": "dummy-project-1234",
+    "storage_bucket": "dummy-project-1234.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1234567890:android:abcdef0123456789",
+        "android_client_info": {
+          "package_name": "com.aris.voice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1234567890-dummy.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aris.voice",
+            "certificate_hash": "d0a14903fdb537dfb53651b166ae7011e2590833"
+          }
+        },
+        {
+          "client_id": "1234567890-dummy2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "YOUR_FIREBASE_API_KEY_HERE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1234567890-dummy3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

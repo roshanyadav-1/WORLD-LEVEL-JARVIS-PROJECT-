@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_aris_login"
+    android:orientation="vertical">
+
+    <!-- Header with back button -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="20dp">
+
+        <ImageView
+            android:id="@+id/backButtonPermissions"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/permissionsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/backButtonPermissions"
+            android:layout_marginStart="8dp"
+            android:text="@string/permissions_explained_title"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/accessibility_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_accessibility"
+                        app:tint="#00E5FF" />
+
+                    <TextView
+                        android:id="@+id/accessibilityStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <TextView
+                        android:id="@+id/accessibilityHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/accessibilityStatus"
+                        android:layout_toEndOf="@id/accessibility_icon"
+                        android:text="@string/accessibility_permission_title" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/accessibility_permission_desc" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/accessibility_permission_details" />
+
+            <TextView
+                android:id="@+id/grantAccessibilityButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_aris_btn_gradient"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="12dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:text="@string/grant_accessibility_permission" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/assistant_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_mic"
+                        app:tint="#00E5FF" />
+
+                    <TextView
+                        android:id="@+id/assistantStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"/>
+
+                    <TextView
+                        android:id="@+id/assistantHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/assistantStatus"
+                        android:layout_toEndOf="@id/assistant_icon"
+                        android:text="@string/default_assistant_permission_title" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/default_assistant_role_desc" />
+
+                <TextView
+                    android:id="@+id/grantAssistantButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_aris_btn_gradient"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:text="@string/grant_default_assistant_permission_button" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/microphone_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_microphone"
+                        app:tint="#00E5FF" />
+
+                    <TextView
+                        android:id="@+id/microphoneStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <TextView
+                        android:id="@+id/microphoneHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/microphoneStatus"
+                        android:layout_toEndOf="@id/microphone_icon"
+                        android:text="@string/microphone_permission_title" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/microphone_permission_desc" />
+
+                <TextView
+                    android:id="@+id/grantMicrophoneButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_aris_btn_gradient"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:text="Grant Microphone Permission" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/overlay_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_overlay"
+                        app:tint="#00E5FF" />
+
+                    <TextView
+                        android:id="@+id/overlayStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"/>
+
+                    <TextView
+                        android:id="@+id/overlayHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/overlayStatus"
+                        android:layout_toEndOf="@id/overlay_icon"
+                        android:text="@string/overlay_permission_title" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/overlay_permission_desc" />
+
+                <TextView
+                    android:id="@+id/grantOverlayButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_aris_btn_gradient"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:text="Grant Overlay Permission" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_aris_glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/appListIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_accessibility"
+                        app:tint="#00E5FF"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/appListStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#90A4AE"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"/>
+
+                    <TextView
+                        android:id="@+id/appListHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/appListStatus"
+                        android:layout_toEndOf="@id/appListIcon"
+                        android:text="@string/app_list_permission_title" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#90A4AE"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/app_list_permission_desc" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

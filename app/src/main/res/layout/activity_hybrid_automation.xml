@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_aris_login">
+
+    <!-- Top Action Bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="32dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_menu"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/text_hae_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/btn_back"
+            android:layout_marginStart="8dp"
+            android:text="Hybrid Automation"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_hae_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_circle_green_transparent"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="ACTIVE"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Engine Architecture Visual Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_aris_glass_card"
+                android:padding="20dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Architecture Diagram"
+                    android:textColor="#00E5FF"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Tier 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="TIER 1:"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Native System Intent (0-delay direct system binder)"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Tier 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="TIER 2:"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dynamic Deep-Link (Web redirect browser fallback)"
+                        android:textColor="#2196F3"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+
+                <!-- Tier 3 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:text="TIER 3:"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Screen Perception Tap (Accessibility clicker fallback)"
+                        android:textColor="#FF3D00"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Interactive Test Harness"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Test Harness Console -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_aris_glass_card"
+                android:padding="20dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select AppIntent to Simulate"
+                    android:textColor="#90A4AE"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Styled Spinner -->
+                <Spinner
+                    android:id="@+id/spinner_intents"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_aris_input"
+                    android:padding="10dp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/text_intent_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No intent selected."
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="20dp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <!-- Dynamic inputs placeholder container -->
+                <LinearLayout
+                    android:id="@+id/container_intent_parameters"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <!-- Field 1 -->
+                    <TextView
+                        android:id="@+id/label_param_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Parameter 1"
+                        android:textColor="#90A4AE"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/edit_param_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_aris_input"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="Value for param 1"
+                        android:textColorHint="#90A4AE"
+                        android:layout_marginBottom="16dp"
+                        android:singleLine="true" />
+
+                    <!-- Field 2 -->
+                    <TextView
+                        android:id="@+id/label_param_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Parameter 2"
+                        android:textColor="#90A4AE"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/edit_param_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_aris_input"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:hint="Value for param 2"
+                        android:textColorHint="#90A4AE"
+                        android:layout_marginBottom="16dp"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <!-- Fire button -->
+                <TextView
+                    android:id="@+id/btn_launch_hae"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_aris_btn_gradient"
+                    android:gravity="center"
+                    android:text="Fire Direct Bypass Hybrid Intent"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Execution Real-Time Telemetry"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Telemetry Logs Terminals -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_aris_glass_card"
+                android:padding="20dp"
+                android:layout_marginBottom="40dp">
+
+                <TextView
+                    android:id="@+id/text_hae_terminal_logs"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:gravity="top|start"
+                    android:text="[HAE System Monitor ready]\n[Standing by for user simulation triggers...]"
+                    android:textColor="#00FF66"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:scrollbars="vertical" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

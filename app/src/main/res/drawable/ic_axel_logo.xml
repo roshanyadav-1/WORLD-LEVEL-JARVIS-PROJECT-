@@ -1,0 +1,68 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="120dp"
+    android:viewportWidth="200"
+    android:viewportHeight="120">
+
+    <!-- Glowing Background Shadow/Glow -->
+    <path
+        android:pathData="M 40,60 C 40,30 85,30 100,60 C 115,90 160,90 160,60 C 160,30 115,30 100,60 C 85,90 40,90 40,60 Z"
+        android:strokeWidth="24"
+        android:strokeAlpha="0.15"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="40"
+                android:startY="60"
+                android:endX="160"
+                android:endY="60"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF8C38FF" />
+                <item android:offset="0.5" android:color="#FF00D2FF" />
+                <item android:offset="1.0" android:color="#FFFF8C00" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Stylized Axel Flowing Wave - Path A (Deep Blue to Neon Purple) -->
+    <path
+        android:pathData="M 35,65 C 35,28 80,28 100,60 C 120,92 165,92 165,55"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="35"
+                android:startY="65"
+                android:endX="165"
+                android:endY="55"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF00D2FF" />
+                <item android:offset="0.5" android:color="#FF8C38FF" />
+                <item android:offset="1.0" android:color="#FFFF007F" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Stylized Axel Flowing Wave - Path B (Neon Yellow to Coral Orange) -->
+    <path
+        android:pathData="M 165,55 C 165,18 120,18 100,60 C 80,102 35,102 35,65"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="165"
+                android:startY="55"
+                android:endX="35"
+                android:endY="65"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFE0E000" />
+                <item android:offset="0.5" android:color="#FFFF8C00" />
+                <item android:offset="1.0" android:color="#FFFF304F" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

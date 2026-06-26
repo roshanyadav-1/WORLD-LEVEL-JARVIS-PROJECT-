@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_aris_glass_card"
+    android:padding="20dp"
+    android:layout_marginBottom="16dp">
+
+    <!-- Header line with name & health status -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tv_module_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Voice Input (STT)"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_module_status_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="#334CAF50"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:text="HEALTHY"
+            android:textColor="#4CAF50"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Description or Affected capability message -->
+    <TextView
+        android:id="@+id/tv_module_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Speech recognition is healthy. Axel can hear your commands clearly."
+        android:textColor="#90A4AE"
+        android:textSize="12sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Test or configuration quick actions row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/btn_module_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:text="RUN TEST"
+            android:textColor="#00E5FF"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

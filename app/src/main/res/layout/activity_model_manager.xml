@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_aris_login"
+    android:padding="16dp">
+
+    <!-- Top Navigation Bar -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/btn_back"
+            android:layout_marginStart="8dp"
+            android:text="OFFLINE CORE LLM MANAGER"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:letterSpacing="0.08" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Overview Banner -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#22FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/txt_overview_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Off-Grid On-Device Intelligence"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/txt_overview_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="To keep your voice queries fully confidential, secure, and fast when signal is weak, Aris downloads lightweight LLM models locally to storage. Active models run 100% locally."
+                        android:textColor="#E0FFFFFF"
+                        android:textSize="12.5sp"
+                        android:lineSpacingExtra="3.5dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AVAILABLE ON-DEVICE REGISTRY"
+                android:textColor="#99FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="12dp" />
+
+            <!-- MODEL CARD 1: GEMMA -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1AFFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/radio_gemma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Qwen2.5-0.5B (Lightweight)"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/white" />
+
+                        <TextView
+                            android:id="@+id/txt_size_gemma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:text="520 MB"
+                            android:textColor="#88FFFFFF"
+                            android:textSize="12sp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Super lightweight specification. Low RAM consumption, ultra-fast generation times, perfect for budget devices."
+                        android:textColor="#B0FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Live progress and speed -->
+                    <RelativeLayout
+                        android:id="@+id/layout_progress_gemma"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone">
+
+                        <ProgressBar
+                            android:id="@+id/progress_gemma"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_toStartOf="@id/txt_pct_gemma"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:progressDrawable="@drawable/feature_check_background" />
+
+                        <TextView
+                            android:id="@+id/txt_pct_gemma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/txt_status_gemma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="Status: Not Installed"
+                            android:textColor="#FFBB86FC"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_download_gemma"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_alignParentEnd="true"
+                            android:backgroundTint="#FF5B48B1"
+                            android:paddingLeft="12dp"
+                            android:paddingRight="12dp"
+                            android:text="DOWNLOAD"
+                            android:textColor="@color/white"
+                            android:textSize="11sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- MODEL CARD 2: QWEN -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1AFFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/radio_qwen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Qwen2.5-1.5B (Standard)"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/white" />
+
+                        <TextView
+                            android:id="@+id/txt_size_qwen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:text="1.6 GB"
+                            android:textColor="#88FFFFFF"
+                            android:textSize="12sp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Highly optimized conversational core. Excellent balance of phone task automation, navigation shortcuts, and reasoning capability."
+                        android:textColor="#B0FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Live progress and speed -->
+                    <RelativeLayout
+                        android:id="@+id/layout_progress_qwen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone">
+
+                        <ProgressBar
+                            android:id="@+id/progress_qwen"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_toStartOf="@id/txt_pct_qwen"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:progressDrawable="@drawable/feature_check_background" />
+
+                        <TextView
+                            android:id="@+id/txt_pct_qwen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/txt_status_qwen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="Status: Not Installed"
+                            android:textColor="#FFBB86FC"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_download_qwen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_alignParentEnd="true"
+                            android:backgroundTint="#FF5B48B1"
+                            android:paddingLeft="12dp"
+                            android:paddingRight="12dp"
+                            android:text="DOWNLOAD"
+                            android:textColor="@color/white"
+                            android:textSize="11sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- MODEL CARD 3: LLAMA -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1AFFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/radio_llama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gemma-4-E2B (Performance)"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:buttonTint="@color/white" />
+
+                        <TextView
+                            android:id="@+id/txt_size_llama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:text="2.58 GB"
+                            android:textColor="#88FFFFFF"
+                            android:textSize="12sp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Highest accuracy local model with advanced capabilities. Understands complex reasoning, multi-turn dialogue, and smart app actions. Recommended for flagship/high-end devices."
+                        android:textColor="#B0FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Live progress and speed -->
+                    <RelativeLayout
+                        android:id="@+id/layout_progress_llama"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:visibility="gone">
+
+                        <ProgressBar
+                            android:id="@+id/progress_llama"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_toStartOf="@id/txt_pct_llama"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="10dp"
+                            android:progressDrawable="@drawable/feature_check_background" />
+
+                        <TextView
+                            android:id="@+id/txt_pct_llama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/txt_status_llama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:text="Status: Not Installed"
+                            android:textColor="#FFBB86FC"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btn_download_llama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_alignParentEnd="true"
+                            android:backgroundTint="#FF5B48B1"
+                            android:paddingLeft="12dp"
+                            android:paddingRight="12dp"
+                            android:text="DOWNLOAD"
+                            android:textColor="@color/white"
+                            android:textSize="11sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- MODEL CARD 4: CUSTOM ENDPOINT -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1AFFFFFF">
+
+                <LinearLayout
+                    android:id="@+id/layout_custom_fields"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <RadioButton
+                        android:id="@+id/radio_custom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Custom Local Server Endpoint"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"
+                        android:buttonTint="@color/white" />
+
+                    <!-- Custom Base URL -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="API Base URL (Ollama, LM Studio, etc.)"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/edit_custom_url"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#22FFFFFF"
+                        android:hint="http://&lt;your-pc-ip-address&gt;:11434/v1"
+                        android:textColorHint="#55FFFFFF"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        android:textSize="13sp"
+                        android:inputType="textUri"
+                        android:maxLines="1"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Custom Model Name -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Model Identifier ID"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/edit_custom_model_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#22FFFFFF"
+                        android:hint="gemma"
+                        android:textColorHint="#55FFFFFF"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        android:textSize="13sp"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Custom API Key -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Authorization Token (Optional)"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/edit_custom_api_key"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#22FFFFFF"
+                        android:hint="Bearer API Key token"
+                        android:textColorHint="#55FFFFFF"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        android:textSize="13sp"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Actions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <Button
+                            android:id="@+id/btn_test_connection"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="TEST CONNECTION"
+                            android:backgroundTint="#FF333333"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <Button
+                            android:id="@+id/btn_fill_ollama"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:text="LOAD DEFAULT OLLAMA"
+                            android:backgroundTint="#FF333333"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:layout_marginStart="6dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Save Global Choice Button -->
+            <Button
+                android:id="@+id/btn_save_config"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="APPLY MODEL CONFIGURATION"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="#FF5B48B1"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

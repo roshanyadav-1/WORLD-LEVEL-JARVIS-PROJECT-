@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_background"
+    android:padding="14dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tv_item_module_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#33FF1744"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="TTS ENGINE"
+            android:textColor="#FF1744"
+            android:textSize="10sp"
+            android:fontFamily="@font/oxanium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_item_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="12:35 PM"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:fontFamily="@font/oxanium" />
+    </RelativeLayout>
+
+    <!-- Error Message -->
+    <TextView
+        android:id="@+id/tv_item_error_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Failed to synthesize speech: 401 Unauthorized"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Affected Area description -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="#151525"
+        android:layout_marginBottom="10dp">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AFFECTED: "
+            android:textColor="#FF9800"
+            android:textSize="11sp"
+            android:fontFamily="@font/oxanium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_item_affected_capability"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Speech output is inactive. Axel will communicate silently."
+            android:textColor="#E0E0E0"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Tech details expander link -->
+    <TextView
+        android:id="@+id/tv_toggle_tech_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="▼ SHOW TECHNICAL DETAILS"
+        android:textColor="@color/accent"
+        android:textSize="11sp"
+        android:fontFamily="@font/oxanium"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <!-- Tech details scrollable stack trace box -->
+    <HorizontalScrollView
+        android:id="@+id/container_tech_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#0A0A0F"
+        android:padding="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_tech_details_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="java.lang.NullPointerException: API key is null"
+            android:textColor="#8C9EFF"
+            android:textSize="10sp"
+            android:typeface="monospace"/>
+    </HorizontalScrollView>
+
+</LinearLayout>

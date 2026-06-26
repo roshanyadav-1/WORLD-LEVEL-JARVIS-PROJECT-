@@ -1,0 +1,91 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- 1. Deep space outer glow background -->
+    <path
+        android:pathData="M 60,60 m -50,0 a 50,50 0 1,1 100,0 a 50,50 0 1,1 -100,0"
+        android:strokeWidth="4"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="60"
+                android:centerY="60"
+                android:gradientRadius="48"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#2D1B4E" />
+                <item android:offset="0.75" android:color="#0F0C24" />
+                <item android:offset="1.0" android:color="#000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 2. Cybernetic 3D orbital outer ring -->
+    <path
+        android:pathData="M 60,60 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0"
+        android:strokeWidth="2.5"
+        android:strokeColor="#8000E5FF"
+        android:strokeLineCap="round" />
+
+    <!-- 3. Frozen/glowing inner sphere with a smooth 3D gradient -->
+    <path
+        android:pathData="M 60,60 m -32,0 a 32,32 0 1,1 64,0 a 32,32 0 1,1 -64,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="48"
+                android:centerY="48"
+                android:gradientRadius="35"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="0.2" android:color="#C1F5FF" />
+                <item android:offset="0.65" android:color="#00D2FF" />
+                <item android:offset="1.0" android:color="#1A223E" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 4. Cute sleeping/resting closed eyes (Frozen/Dormant style) -->
+    <path
+        android:pathData="M 44,58 L 52,58"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M 68,58 L 76,58"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Subtle sleeping blush cheeks -->
+    <path
+        android:pathData="M 44,66 m -2.5,0 a 2.5,2.5 0 1,1 5,0 a 2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#40FF007F" />
+
+    <path
+        android:pathData="M 76,66 m -2.5,0 a 2.5,2.5 0 1,1 5,0 a 2.5,2.5 0 1,1 -5,0"
+        android:fillColor="#40FF007F" />
+
+    <!-- Tiny decorative icy crystals/sparkles -->
+    <path
+        android:pathData="M 60,18 L 60,24 M 57,21 L 63,21"
+        android:strokeWidth="1.5"
+        android:strokeColor="#A0E6FF"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M 30,35 L 34,39 M 34,35 L 30,39"
+        android:strokeWidth="1"
+        android:strokeColor="#A0E6FF"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M 90,35 L 94,39 M 94,35 L 90,39"
+        android:strokeWidth="1"
+        android:strokeColor="#A0E6FF"
+        android:strokeLineCap="round" />
+
+</vector>

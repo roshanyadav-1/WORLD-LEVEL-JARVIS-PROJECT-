@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_aris_login"
+    tools:context=".triggers.ui.CreateTriggerActivity">
+
+    <!-- Header with back button -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="20dp"
+        android:background="#1AFFFFFF">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/btn_back"
+            android:layout_marginStart="8dp"
+            android:text="Create Trigger"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                style="@style/PermissionHeading"
+                android:text="Trigger Type"
+                android:textColor="#00E5FF"
+                android:fontFamily="sans-serif-medium" />
+
+            <Spinner
+                android:id="@+id/triggerTypeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_aris_input"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:popupBackground="#263238" />
+
+            <TextView
+                style="@style/PermissionHeading"
+                android:text="Task Instruction"
+                android:textColor="#00E5FF"
+                android:fontFamily="sans-serif-medium" />
+
+            <EditText
+                android:id="@+id/instructionEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_aris_input"
+                android:hint="e.g., 'Read the notification'"
+                android:inputType="textMultiLine"
+                android:minLines="2"
+                android:maxLines="5"
+                android:scrollbars="vertical"
+                android:gravity="top"
+                android:padding="14dp"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium"
+                android:textColorHint="#90A4AE" />
+
+            <LinearLayout
+                android:id="@+id/scheduledTimeOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/alarmPermissionWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="@drawable/warning_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Permission Required"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="To schedule tasks at precise times, A.R.I.S needs the 'Alarms &amp; Reminders' permission."
+                        android:textColor="#90A4AE"/>
+
+                    <TextView
+                        android:id="@+id/grantAlarmPermissionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Grant Permission"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="#00E5FF"
+                        android:layout_marginTop="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"/>
+                </LinearLayout>
+
+                <TextView
+                    style="@style/PermissionHeading"
+                    android:text="Set Trigger Time"
+                    android:textColor="#00E5FF"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TimePicker
+                    android:id="@+id/timePicker"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/AppTheme.NumberPicker"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    style="@style/PermissionHeading"
+                    android:layout_marginTop="8dp"
+                    android:text="Repeat on"
+                    android:textColor="#00E5FF"
+                    android:fontFamily="sans-serif-medium" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/dayOfWeekChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="false">
+
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="M"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="W"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="F"/>
+                    <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S"/>
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/notificationOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/notificationPermissionWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="@drawable/warning_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Permission Required"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="To read notifications, A.R.I.S needs permission to access them."
+                        android:textColor="#90A4AE"/>
+
+                    <TextView
+                        android:id="@+id/grantNotificationPermissionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        android:text="Grant Permission"
+                        android:textColor="#00E5FF"
+                        android:layout_marginTop="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"/>
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/selectAllAppsCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Applications"
+                    android:textColor="@color/white"/>
+
+                <TextView
+                    style="@style/PermissionHeading"
+                    android:text="Select App"
+                    android:textColor="#00E5FF"
+                    android:fontFamily="sans-serif-medium" />
+
+                <EditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_aris_input"
+                    android:hint="Search Apps"
+                    android:inputType="text"
+                    android:padding="14dp"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColorHint="#90A4AE" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/appsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="8dp"
+                    tools:listitem="@layout/item_app" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/chargingStateOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/PermissionHeading"
+                    android:text="Trigger When"
+                    android:textColor="#00E5FF"
+                    android:fontFamily="sans-serif-medium" />
+
+                <RadioGroup
+                    android:id="@+id/chargingStatusRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/radioConnected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Power Connected"
+                        android:textColor="@color/white"
+                        android:checked="true"/>
+
+                    <RadioButton
+                        android:id="@+id/radioDisconnected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Power Disconnected"
+                        android:textColor="@color/white"/>
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/testTriggerButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="24dp"
+                    android:text="Test Trigger"
+                    android:textColor="#00E5FF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:layout_marginEnd="16dp"/>
+
+                <TextView
+                    android:id="@+id/saveTriggerButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_aris_btn_gradient"
+                    android:gravity="center"
+                    android:paddingHorizontal="32dp"
+                    android:text="Save Trigger"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

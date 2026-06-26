@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="wave_color">#00BCD4</color>
+    
+    <!-- Modern Axel UI Colors -->
+    <color name="axel_background">#121212</color>
+    <color name="axel_card_bg">#18181A</color>
+    <color name="axel_card_surface">#1C1C1F</color>
+    <color name="axel_border">#3F4452</color>
+    <color name="axel_text_primary">#F1F5F9</color>
+    <color name="axel_text_secondary">#94A3B8</color>
+    <color name="axel_gradient_purple">#64748B</color>
+    <color name="axel_gradient_blue">#CBD5E1</color>
+    <color name="axel_orange_start">#94A3B8</color>
+    <color name="axel_orange_end">#F1F5F9</color>
+
+    <color name="background_color">#121212</color> <!-- Dark background -->
+    <color name="dark_background">#121212</color>
+    <color name="button_blue">#94A3B8</color>
+    <color name="text_gray">#94A3B8</color>
+    <color name="gradient_start">#64748B</color>
+    <color name="gradient_end">#CBD5E1</color>
+    <color name="input_box_background">#1C1C1F</color>
+    <color name="panel_background">#1C1C1F</color>
+    
+    <!-- Memory management colors -->
+    <color name="background">#121212</color>
+    <color name="primary">#121212</color>
+    <color name="accent">#CBD5E1</color>
+    <color name="surface">#1C1C1F</color>
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="orange">#E2E8F0</color>
+
+    <!-- Delta symbol state colors -->
+    <color name="delta_idle">#94A3B8</color>        <!-- Metallic Slate Gray matrix glow -->
+    <color name="delta_listening">#E2E8F0</color>   <!-- Brushed Platinum - listening -->
+    <color name="delta_processing">#CBD5E1</color>  <!-- Chrome Silver - thinking/processing -->
+    <color name="delta_speaking">#F8FAFC</color>    <!-- Pure Diamond Silver - speaking -->
+    <color name="delta_error">#FF5252</color>       <!-- Radiant Crimson - list error code -->
+</resources>
