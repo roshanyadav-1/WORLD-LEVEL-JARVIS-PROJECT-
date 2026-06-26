@@ -658,7 +658,12 @@ class BrainOrchestratorImpl(
 
     override suspend fun processExecutionResult(executionResult: com.aris.voice.domain.ExecutionResult): ArisResult<Decision> {
         val message = if (executionResult.isSuccess) {
-            "I have completed the task."
+            val lastOutput = executionResult.stepResults.lastOrNull { !it.output.isNullOrBlank() }?.output
+            if (lastOutput != null && (lastOutput.contains("Launched") || lastOutput.contains("Opened") || lastOutput.contains("opening") || lastOutput.contains("Sure"))) {
+                lastOutput
+            } else {
+                "I have completed the task."
+            }
         } else {
             "I encountered a problem: ${executionResult.failureReason}"
         }

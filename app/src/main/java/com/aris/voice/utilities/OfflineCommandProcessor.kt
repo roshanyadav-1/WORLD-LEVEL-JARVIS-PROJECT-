@@ -178,58 +178,52 @@ class OfflineCommandProcessor(private val context: Context) {
     }
 
     private fun handleOpenAppByAlias(alias: String, cleanName: String): CommandResult {
-        val pm = context.packageManager
-        val list = appAliases[alias] ?: listOf(alias)
-        for (candidate in list) {
-            val pkg = appCache[candidate]
-            if (pkg != null) {
-                val intent = pm.getLaunchIntentForPackage(pkg)
+        val resolver = com.aris.voice.utilities.AppLauncherResolver(context)
+        return when (val res = resolver.resolveApp(alias)) {
+            is com.aris.voice.utilities.AppResolutionResult.Success -> {
+                val pm = context.packageManager
+                val intent = pm.getLaunchIntentForPackage(res.packageName)
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(intent)
-                    return CommandResult(true, "Opening $cleanName")
+                    CommandResult(true, "Opening $cleanName")
+                } else {
+                    CommandResult(false)
                 }
             }
+            else -> CommandResult(false)
         }
-        return CommandResult(false)
     }
 
     private fun handleOpenApp(command: String): CommandResult {
-        var cleanName = command
+        val cleanName = command
             .replace("open", "")
             .replace("launch", "")
             .replace("kholo", "")
             .replace("chalu karo", "")
-            .replace("app", "")
             .trim()
 
-        var matchedPkg: String? = null
-        var foundAppName = cleanName
-
-        for ((key, aliases) in appAliases) {
-            if (aliases.any { cleanName.contains(it) }) {
-                matchedPkg = appCache[key]
-                foundAppName = key
-                if (matchedPkg != null) break
+        val resolver = com.aris.voice.utilities.AppLauncherResolver(context)
+        return when (val res = resolver.resolveApp(cleanName)) {
+            is com.aris.voice.utilities.AppResolutionResult.Success -> {
+                val pm = context.packageManager
+                val intent = pm.getLaunchIntentForPackage(res.packageName)
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                    CommandResult(true, "Sure, opening ${res.appLabel}.")
+                } else {
+                    CommandResult(false)
+                }
+            }
+            is com.aris.voice.utilities.AppResolutionResult.Ambiguous -> {
+                val apps = res.candidates.joinToString(" or ") { it.label }
+                CommandResult(true, "I found multiple apps matching '$cleanName': $apps. Which one would you like to open?")
+            }
+            is com.aris.voice.utilities.AppResolutionResult.NotFound -> {
+                CommandResult(false) // Let it fallback to the brain/LLM path for complex commands
             }
         }
-
-        if (matchedPkg == null) {
-            matchedPkg = appCache.entries.find { cleanName.contains(it.key) }?.value
-            foundAppName = appCache.entries.find { cleanName.contains(it.key) }?.key ?: cleanName
-        }
-
-        if (matchedPkg != null) {
-            val pm = context.packageManager
-            val intent = pm.getLaunchIntentForPackage(matchedPkg)
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-                return CommandResult(true, "Sure, opening $foundAppName.")
-            }
-        }
-
-        return CommandResult(false)
     }
 
     private fun handleCall(command: String): CommandResult {

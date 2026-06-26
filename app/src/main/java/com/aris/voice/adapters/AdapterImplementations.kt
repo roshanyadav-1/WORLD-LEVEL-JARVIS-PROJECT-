@@ -111,11 +111,43 @@ class ActionAdapterImpl(
                 }
                 "LAUNCH_APP" -> {
                     val packageName = params["packageName"]?.toString() ?: ""
-                    val success = finger.openApp(packageName)
+                    var success = finger.openApp(packageName)
+                    var finalLabel = packageName
+                    if (!success && !packageName.contains(".")) {
+                        val resolver = com.aris.voice.utilities.AppLauncherResolver(context)
+                        when (val res = resolver.resolveApp(packageName)) {
+                            is com.aris.voice.utilities.AppResolutionResult.Success -> {
+                                success = finger.openApp(res.packageName)
+                                finalLabel = res.appLabel
+                            }
+                            else -> {}
+                        }
+                    }
                     if (success) {
-                        ArisResult.Success("Launched application: $packageName")
+                        ArisResult.Success("Sure, opening $finalLabel.")
                     } else {
                         ArisResult.Failure(ArisError.ExecutionError("APP_NOT_FOUND", "Failed to open app $packageName"))
+                    }
+                }
+                "PACKAGE_MANAGER" -> {
+                    val target = params["target"]?.toString() ?: ""
+                    val resolver = com.aris.voice.utilities.AppLauncherResolver(context)
+                    when (val res = resolver.resolveApp(target)) {
+                        is com.aris.voice.utilities.AppResolutionResult.Success -> {
+                            val success = finger.openApp(res.packageName)
+                            if (success) {
+                                ArisResult.Success("Sure, opening ${res.appLabel}.")
+                            } else {
+                                ArisResult.Failure(ArisError.ExecutionError("APP_NOT_FOUND", "Failed to open app ${res.appLabel} (${res.packageName})"))
+                            }
+                        }
+                        is com.aris.voice.utilities.AppResolutionResult.Ambiguous -> {
+                            val apps = res.candidates.joinToString(" or ") { it.label }
+                            ArisResult.Failure(ArisError.ExecutionError("AMBIGUOUS_APP", "I found multiple apps matching '$target': $apps. Which one would you like to open?"))
+                        }
+                        is com.aris.voice.utilities.AppResolutionResult.NotFound -> {
+                            ArisResult.Failure(ArisError.ExecutionError("APP_NOT_FOUND", "I couldn't find an app named '$target' installed on this device."))
+                        }
                     }
                 }
                 else -> {
