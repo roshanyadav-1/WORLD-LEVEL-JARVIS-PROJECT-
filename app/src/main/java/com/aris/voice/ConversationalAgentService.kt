@@ -1,5 +1,7 @@
 package com.aris.voice
 
+import android.annotation.SuppressLint
+
 import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
@@ -83,6 +85,7 @@ data class ModelDecision(
     val shouldEnd: Boolean = false
 )
 
+@SuppressLint("NewApi")
 class ConversationalAgentService : Service() {
 
     private val speechCoordinator by lazy { SpeechCoordinator.getInstance(this) }
@@ -606,6 +609,33 @@ class ConversationalAgentService : Service() {
                     speechCoordinator.speakText("Searching real-time news and facts...")
                 }
                 
+                // Attempt to process via the new Cognitive Runtime
+                var cognitiveRuntimeSucceeded = false
+                try {
+                    val voiceSessionManager = com.aris.voice.di.ArisServiceRegistry.get(com.aris.voice.runtime.IVoiceSessionManager::class.java)
+                    val newRuntimeResult = voiceSessionManager.processInput(userInput)
+                    
+                    if (newRuntimeResult is com.aris.voice.core.ArisResult.Success<*>) {
+                        cognitiveRuntimeSucceeded = true
+                    } else if (newRuntimeResult is com.aris.voice.core.ArisResult.Failure) {
+                        Log.e("ConvAgent", "Cognitive Runtime returned failure: ${newRuntimeResult.error.message}")
+                    }
+                } catch (e: Exception) {
+                    Log.e("ConvAgent", "Cognitive Runtime threw an exception: ${e.message}", e)
+                }
+
+                if (cognitiveRuntimeSucceeded) {
+                    visualFeedbackManager.hideThinkingIndicator()
+                    
+                    // After the new runtime finishes processing and speaking, we restart listening if not in text mode
+                    if (!isTextModeActive) {
+                        startSttListeningEngine()
+                    }
+                    return@launch
+                }
+
+                // Fallback to the legacy runtime if the new runtime fails or returns an error
+                Log.e("ConvAgent", "New Cognitive Runtime failed, falling back to legacy reasoning")
                 val rawModelResponse = try {
                     getReasoningModelApiResponse(
                         conversationHistory,
@@ -995,7 +1025,9 @@ class ConversationalAgentService : Service() {
     /**
      * Updates the system prompt with relevant memories and current screen context
      */
+    @SuppressLint("NewApi")
     private suspend fun updateSystemPromptWithScreenContext() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R) return
         val timeSinceLastUpdate = System.currentTimeMillis() - lastScreenContextUpdate
         if (timeSinceLastUpdate < 30_000) return
         lastScreenContextUpdate = System.currentTimeMillis()

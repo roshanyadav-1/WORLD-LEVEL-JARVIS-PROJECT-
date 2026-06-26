@@ -1,5 +1,7 @@
 package com.aris.voice.brain
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.aris.voice.core.ArisError
 import com.aris.voice.core.ArisResult
 import com.aris.voice.domain.ArisContext
@@ -531,8 +533,17 @@ class BrainOrchestratorImpl(
     private val reasoningEngine: IReasoningEngine,
     private val riskValidator: IRiskValidator,
     private val toolSelector: IToolSelector,
-    private val decisionEngine: IDecisionEngine
+    private val decisionEngine: IDecisionEngine,
+    private val experienceEngine: IExperienceEngine? = null,
+    private val reflectionEngine: com.aris.voice.learning.IReflectionEngine? = null,
+    private val learningEngine: com.aris.voice.learning.ILearningEngine? = null,
+    private val knowledgeEngine: IKnowledgeEngine? = null
 ) : IBrainOrchestrator {
+
+    private var lastIntent: com.aris.voice.domain.UserIntent? = null
+    private var lastStrategy: com.aris.voice.domain.Strategy? = null
+    private var lastDecision: com.aris.voice.domain.Decision? = null
+    private var lastWorldModelData: com.aris.voice.domain.WorldModelData? = null
 
     override suspend fun think(rawUserRequest: String): ArisResult<Decision> {
         return try {
@@ -578,11 +589,87 @@ class BrainOrchestratorImpl(
                 is ArisResult.Failure -> return ArisResult.Failure(res.error)
             }
             
+            this.lastIntent = goal
+            this.lastStrategy = strategy
+            this.lastDecision = decision
+            this.lastWorldModelData = worldModel.getWorldModelData()
+
             // For now, return the initial decision. A future module might use reasoningResult to alter the decision.
             ArisResult.Success(decision)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.BrainError("COGNITION_PIPELINE_ERROR", "Thinking execution failed unexpectedly", e))
         }
+    }
+
+    override suspend fun processExecutionResult(executionResult: com.aris.voice.domain.ExecutionResult): ArisResult<Decision> {
+        val message = if (executionResult.isSuccess) {
+            "I have completed the task."
+        } else {
+            "I encountered a problem: ${executionResult.failureReason}"
+        }
+        val decision = Decision(
+            decisionId = java.util.UUID.randomUUID().toString(),
+            type = com.aris.voice.domain.DecisionType.WAIT,
+            reason = message,
+            confidence = 1.0f,
+            riskLevel = com.aris.voice.domain.RiskLevel.LOW
+        )
+
+        // Trigger Cognitive Learning Loop Asynchronously
+        val currentIntent = this.lastIntent
+        val currentStrategy = this.lastStrategy
+        val currentDecision = this.lastDecision
+        val currentWorldModelData = this.lastWorldModelData
+
+        if (currentIntent != null && currentStrategy != null && currentDecision != null && currentWorldModelData != null && experienceEngine != null && reflectionEngine != null && learningEngine != null && knowledgeEngine != null) {
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.SupervisorJob()).launch {
+                try {
+                    val experienceResult = experienceEngine.recordExperience(
+                        intent = currentIntent,
+                        strategy = currentStrategy,
+                        decision = currentDecision,
+                        executionResult = executionResult,
+                        worldModelSnapshot = currentWorldModelData
+                    )
+                    
+                    if (experienceResult is ArisResult.Success) {
+                        val summaryResult = experienceEngine.generateSummary(currentIntent.primaryIntent)
+                        if (summaryResult is ArisResult.Success) {
+                            val reflectionResult = reflectionEngine.reflectOnExperience(
+                                listOf(experienceResult.value),
+                                summaryResult.value
+                            )
+                            
+                            if (reflectionResult is ArisResult.Success) {
+                                val learningResult = learningEngine.evaluateLearningOpportunity(
+                                    reflectionResult.value,
+                                    summaryResult.value
+                                )
+                                
+                                if (learningResult is ArisResult.Success) {
+                                    val learningDecision = learningResult.value
+                                    if (learningDecision.isApproved && learningDecision.proposal.proposalType == com.aris.voice.domain.LearningProposalType.UPDATE_SKILL && learningDecision.proposal.suggestedSkillChanges.isNotEmpty()) {
+                                        val knowledgeNode = com.aris.voice.domain.KnowledgeNode(
+                                            knowledgeId = "know_" + java.util.UUID.randomUUID().toString(),
+                                            knowledgeType = com.aris.voice.domain.KnowledgeType.PROCEDURE_REFERENCE,
+                                            name = "Learned skill from ${currentIntent.primaryIntent}",
+                                            description = "Learned skill: ${learningDecision.proposal.suggestedSkillChanges.first()}",
+                                            source = "Learning Loop",
+                                            confidence = 0.9f
+                                        )
+                                        knowledgeEngine.addKnowledge(knowledgeNode)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("CognitiveLearning", "Learning loop failed", e)
+                }
+            }
+        }
+
+        return ArisResult.Success(decision)
     }
 }
 
@@ -747,5 +834,509 @@ class SkillEngineImpl : ISkillEngine {
         val penalty = skill.failureRate * 0.3f
         
         return (baseScore + usageBonus + confidenceScore - penalty).coerceIn(0.0f, 1.0f)
+    }
+}
+
+class ExecutionOrchestratorImpl(
+    private val actionExecutor: com.aris.voice.actions.IActionExecutor,
+    private val worldModel: IWorldModel
+) : IExecutionOrchestrator {
+    
+    private var currentState = com.aris.voice.domain.ExecutionState.IDLE
+    private var currentStepIndex = 0
+    private var completedSteps = 0
+    private var failedSteps = 0
+    private var retryCount = 0
+    private var recoveryCount = 0
+    
+    override suspend fun executeDecision(
+        decision: com.aris.voice.domain.Decision,
+        onProgress: (com.aris.voice.domain.ExecutionProgress) -> Unit
+    ): com.aris.voice.domain.ExecutionResult {
+        if (decision.type != com.aris.voice.domain.DecisionType.EXECUTE_PLAN || decision.plan == null) {
+            return com.aris.voice.domain.ExecutionResult(
+                planId = decision.plan?.planId ?: "unknown",
+                isSuccess = false,
+                totalExecutionTimeMs = 0L,
+                stepResults = emptyList(),
+                failureReason = "Decision not approved for execution or plan is missing"
+            )
+        }
+
+        val plan = decision.plan
+        val startTime = System.currentTimeMillis()
+        val stepResults = mutableListOf<com.aris.voice.domain.StepExecutionResult>()
+        
+        currentState = com.aris.voice.domain.ExecutionState.STARTING
+        currentStepIndex = 0
+        completedSteps = 0
+        failedSteps = 0
+        retryCount = 0
+        recoveryCount = 0
+        
+        reportProgress(plan.steps.size, startTime, onProgress)
+        
+        currentState = com.aris.voice.domain.ExecutionState.EXECUTING
+
+        while (currentStepIndex < plan.steps.size) {
+            if (currentState == com.aris.voice.domain.ExecutionState.CANCELLED) {
+                return com.aris.voice.domain.ExecutionResult(
+                    planId = plan.planId,
+                    isSuccess = false,
+                    isCancelled = true,
+                    totalExecutionTimeMs = System.currentTimeMillis() - startTime,
+                    stepResults = stepResults,
+                    failureReason = "Execution cancelled"
+                )
+            }
+            
+            while (currentState == com.aris.voice.domain.ExecutionState.PAUSED) {
+                kotlinx.coroutines.delay(100)
+            }
+            
+            val step = plan.steps[currentStepIndex]
+            val stepStartTime = System.currentTimeMillis()
+            var stepSuccess = false
+            var currentStepRetryCount = 0
+            var stepErrorMessage: String? = null
+            var output: String? = null
+            
+            val maxRetries = when (step.retryPolicy) {
+                com.aris.voice.domain.RetryPolicy.NONE -> 0
+                com.aris.voice.domain.RetryPolicy.ONCE -> 1
+                com.aris.voice.domain.RetryPolicy.THREE_TIMES -> 3
+                com.aris.voice.domain.RetryPolicy.EXPONENTIAL_BACKOFF -> 3
+            }
+            
+            while (!stepSuccess && currentStepRetryCount <= maxRetries) {
+                if (currentStepRetryCount > 0) {
+                    currentState = com.aris.voice.domain.ExecutionState.RETRYING
+                    reportProgress(plan.steps.size, startTime, onProgress)
+                }
+
+                try {
+                    val result = actionExecutor.executeStep(step)
+                    
+                    if (result is ArisResult.Success) {
+                        output = result.value
+                        
+                        // Verification
+                        currentState = com.aris.voice.domain.ExecutionState.VERIFYING
+                        reportProgress(plan.steps.size, startTime, onProgress)
+                        
+                        // Update world model and check if expected result is achieved
+                        worldModel.updateWorldModel()
+                        
+                        // Basic verification: assume success if action didn't throw
+                        stepSuccess = true
+                    } else if (result is ArisResult.Failure) {
+                        stepErrorMessage = result.error.message
+                        currentStepRetryCount++
+                        retryCount++
+                    }
+                } catch (e: Exception) {
+                    stepErrorMessage = e.message
+                    currentStepRetryCount++
+                    retryCount++
+                }
+            }
+            
+            val stepExecutionTime = System.currentTimeMillis() - stepStartTime
+            val stepResult = if (stepSuccess) {
+                completedSteps++
+                com.aris.voice.domain.StepExecutionResult(
+                    stepId = step.stepId,
+                    status = com.aris.voice.domain.StepStatus.SUCCESS,
+                    executionTimeMs = stepExecutionTime,
+                    output = output
+                )
+            } else {
+                failedSteps++
+                com.aris.voice.domain.StepExecutionResult(
+                    stepId = step.stepId,
+                    status = com.aris.voice.domain.StepStatus.FAILED,
+                    executionTimeMs = stepExecutionTime,
+                    errorMessage = stepErrorMessage ?: "Step failed after max retries"
+                )
+            }
+            
+            stepResults.add(stepResult)
+            
+            if (!stepSuccess) {
+                val requiresRecovery = step.failurePolicy == com.aris.voice.domain.FailurePolicy.FALLBACK
+                if (requiresRecovery) {
+                    currentState = com.aris.voice.domain.ExecutionState.RECOVERING
+                    reportProgress(plan.steps.size, startTime, onProgress, stepResult)
+                } else {
+                    currentState = com.aris.voice.domain.ExecutionState.FAILED
+                    reportProgress(plan.steps.size, startTime, onProgress, stepResult)
+                }
+                
+                return com.aris.voice.domain.ExecutionResult(
+                    planId = plan.planId,
+                    isSuccess = false,
+                    requiresRecovery = requiresRecovery,
+                    totalExecutionTimeMs = System.currentTimeMillis() - startTime,
+                    stepResults = stepResults,
+                    failureReason = stepResult.errorMessage
+                )
+            }
+            
+            currentStepIndex++
+            currentState = com.aris.voice.domain.ExecutionState.EXECUTING
+            reportProgress(plan.steps.size, startTime, onProgress, stepResult)
+        }
+        
+        currentState = com.aris.voice.domain.ExecutionState.COMPLETED
+        reportProgress(plan.steps.size, startTime, onProgress)
+        
+        return com.aris.voice.domain.ExecutionResult(
+            planId = plan.planId,
+            isSuccess = true,
+            totalExecutionTimeMs = System.currentTimeMillis() - startTime,
+            stepResults = stepResults
+        )
+    }
+
+    private fun reportProgress(
+        totalSteps: Int,
+        startTime: Long,
+        onProgress: (com.aris.voice.domain.ExecutionProgress) -> Unit,
+        stepResult: com.aris.voice.domain.StepExecutionResult? = null
+    ) {
+        onProgress(
+            com.aris.voice.domain.ExecutionProgress(
+                state = currentState,
+                currentStepIndex = currentStepIndex,
+                totalSteps = totalSteps,
+                completedSteps = completedSteps,
+                failedSteps = failedSteps,
+                retryCount = retryCount,
+                recoveryCount = recoveryCount,
+                totalExecutionTimeMs = System.currentTimeMillis() - startTime,
+                currentStepResult = stepResult
+            )
+        )
+    }
+
+    override fun pause() {
+        if (currentState == com.aris.voice.domain.ExecutionState.EXECUTING || 
+            currentState == com.aris.voice.domain.ExecutionState.STARTING ||
+            currentState == com.aris.voice.domain.ExecutionState.RETRYING) {
+            currentState = com.aris.voice.domain.ExecutionState.PAUSED
+        }
+    }
+
+    override fun resume() {
+        if (currentState == com.aris.voice.domain.ExecutionState.PAUSED) {
+            currentState = com.aris.voice.domain.ExecutionState.EXECUTING
+        }
+    }
+
+    override fun cancel() {
+        if (currentState != com.aris.voice.domain.ExecutionState.COMPLETED && 
+            currentState != com.aris.voice.domain.ExecutionState.FAILED) {
+            currentState = com.aris.voice.domain.ExecutionState.CANCELLED
+        }
+    }
+}
+
+class MemoryEngineImpl : IMemoryEngine {
+    private val memoryStore = mutableMapOf<String, com.aris.voice.domain.MemoryItem>()
+
+    override suspend fun store(memory: com.aris.voice.domain.MemoryItem): ArisResult<Unit> {
+        memoryStore[memory.memoryId] = memory
+        return ArisResult.Success(Unit)
+    }
+
+    override suspend fun retrieve(memoryId: String): ArisResult<com.aris.voice.domain.MemoryItem?> {
+        val memory = memoryStore[memoryId]
+        if (memory?.isArchived == true) {
+            return ArisResult.Success(null)
+        }
+        return ArisResult.Success(memory)
+    }
+
+    override suspend fun update(memory: com.aris.voice.domain.MemoryItem): ArisResult<Unit> {
+        if (!memoryStore.containsKey(memory.memoryId)) {
+            return ArisResult.Failure(ArisError.BrainError("MEMORY_NOT_FOUND", "Memory with ID ${memory.memoryId} not found", null))
+        }
+        memoryStore[memory.memoryId] = memory
+        return ArisResult.Success(Unit)
+    }
+
+    override suspend fun delete(memoryId: String): ArisResult<Unit> {
+        memoryStore.remove(memoryId)
+        return ArisResult.Success(Unit)
+    }
+
+    override suspend fun archive(memoryId: String): ArisResult<Unit> {
+        val memory = memoryStore[memoryId] ?: return ArisResult.Failure(ArisError.BrainError("MEMORY_NOT_FOUND", "Memory with ID $memoryId not found", null))
+        memoryStore[memoryId] = memory.copy(isArchived = true)
+        return ArisResult.Success(Unit)
+    }
+
+    override suspend fun search(query: com.aris.voice.domain.MemoryQuery): ArisResult<List<com.aris.voice.domain.MemoryItem>> {
+        var results = memoryStore.values.asSequence()
+        
+        if (!query.includeArchived) {
+            results = results.filter { !it.isArchived }
+        }
+        
+        if (query.type != null) {
+            results = results.filter { it.memoryType == query.type }
+        }
+        
+        if (query.minImportance != null) {
+            results = results.filter { it.importanceScore >= query.minImportance }
+        }
+        
+        if (query.minConfidence != null) {
+            results = results.filter { it.confidence >= query.minConfidence }
+        }
+        
+        if (query.source != null) {
+            results = results.filter { it.source == query.source }
+        }
+        
+        if (query.tags.isNotEmpty()) {
+            results = results.filter { it.tags.containsAll(query.tags) }
+        }
+        
+        if (!query.query.isNullOrBlank()) {
+            val q = query.query.lowercase()
+            results = results.filter { it.content.lowercase().contains(q) }
+        }
+        
+        val sortedResults = results.sortedByDescending { it.importanceScore * it.confidence }.take(query.limit).toList()
+        
+        return ArisResult.Success(sortedResults)
+    }
+
+    override suspend fun expireTemporaryMemories(): ArisResult<Unit> {
+        val currentTime = System.currentTimeMillis()
+        val toRemove = memoryStore.values.filter { 
+            it.expiresAt != null && currentTime > it.expiresAt 
+        }.map { it.memoryId }
+        
+        toRemove.forEach { memoryStore.remove(it) }
+        
+        return ArisResult.Success(Unit)
+    }
+}
+
+class ExperienceEngineImpl : IExperienceEngine {
+    private val experiences = mutableMapOf<String, com.aris.voice.domain.ExperienceRecord>()
+
+    override suspend fun recordExperience(
+        intent: com.aris.voice.domain.UserIntent,
+        strategy: com.aris.voice.domain.Strategy,
+        decision: com.aris.voice.domain.Decision,
+        executionResult: com.aris.voice.domain.ExecutionResult,
+        worldModelSnapshot: com.aris.voice.domain.WorldModelData,
+        memoryReferences: List<String>,
+        skillReference: String?
+    ): com.aris.voice.core.ArisResult<com.aris.voice.domain.ExperienceRecord> {
+        val planId = decision.plan?.planId ?: "unknown"
+        
+        var retryCount = 0
+        var recoveryCount = 0
+        if (executionResult.requiresRecovery) {
+            recoveryCount = 1
+        }
+        
+        val successScore = if (executionResult.isSuccess) 1.0f else if (executionResult.isCancelled) 0.5f else 0.0f
+        val confidence = if (executionResult.isSuccess) 0.9f else 0.4f
+        
+        val record = com.aris.voice.domain.ExperienceRecord(
+            experienceId = java.util.UUID.randomUUID().toString(),
+            timestamp = System.currentTimeMillis(),
+            intent = intent,
+            strategy = strategy,
+            planId = planId,
+            decisionId = decision.decisionId,
+            executionResult = executionResult,
+            retryCount = retryCount,
+            recoveryCount = recoveryCount,
+            executionDurationMs = executionResult.totalExecutionTimeMs,
+            successScore = successScore,
+            confidence = confidence,
+            failureReason = executionResult.failureReason,
+            environmentSnapshotReference = "env_snap_" + System.currentTimeMillis(),
+            memoryReferences = memoryReferences,
+            skillReference = skillReference
+        )
+        
+        experiences[record.experienceId] = record
+        return com.aris.voice.core.ArisResult.Success(record)
+    }
+
+    override suspend fun getExperiences(intentName: String?, limit: Int): com.aris.voice.core.ArisResult<List<com.aris.voice.domain.ExperienceRecord>> {
+        var results = experiences.values.asSequence()
+        if (intentName != null) {
+            results = results.filter { it.intent.primaryIntent == intentName }
+        }
+        return com.aris.voice.core.ArisResult.Success(results.sortedByDescending { it.timestamp }.take(limit).toList())
+    }
+
+    override suspend fun generateSummary(intentName: String): com.aris.voice.core.ArisResult<com.aris.voice.domain.ExperienceSummary> {
+        val relevant = experiences.values.filter { it.intent.primaryIntent == intentName }
+        
+        if (relevant.isEmpty()) {
+            return com.aris.voice.core.ArisResult.Success(
+                com.aris.voice.domain.ExperienceSummary(
+                    intent = intentName,
+                    totalExecutions = 0,
+                    successfulExecutions = 0,
+                    failedExecutions = 0,
+                    averageExecutionDurationMs = 0L,
+                    averageSuccessScore = 0.0f,
+                    commonFailureReasons = emptyList(),
+                    overallConfidence = 0.0f
+                )
+            )
+        }
+        
+        val successful = relevant.filter { it.executionResult.isSuccess }
+        val failed = relevant.filter { !it.executionResult.isSuccess && !it.executionResult.isCancelled }
+        
+        val avgDuration = if (relevant.isNotEmpty()) relevant.map { it.executionDurationMs }.average().toLong() else 0L
+        val avgScore = if (relevant.isNotEmpty()) relevant.map { it.successScore }.average().toFloat() else 0.0f
+        
+        val commonFailures = failed.mapNotNull { it.failureReason }
+            .groupBy { it }
+            .mapValues { it.value.size }
+            .entries.sortedByDescending { it.value }
+            .take(3)
+            .map { it.key }
+            
+        val confidence = if (relevant.isNotEmpty()) relevant.map { it.confidence }.average().toFloat() else 0.0f
+        
+        return com.aris.voice.core.ArisResult.Success(
+            com.aris.voice.domain.ExperienceSummary(
+                intent = intentName,
+                totalExecutions = relevant.size,
+                successfulExecutions = successful.size,
+                failedExecutions = failed.size,
+                averageExecutionDurationMs = avgDuration,
+                averageSuccessScore = avgScore,
+                commonFailureReasons = commonFailures,
+                overallConfidence = confidence
+            )
+        )
+    }
+}
+
+class KnowledgeEngineImpl : IKnowledgeEngine {
+    private val nodes = mutableMapOf<String, com.aris.voice.domain.KnowledgeNode>()
+    private val relations = mutableListOf<com.aris.voice.domain.KnowledgeRelation>()
+
+    override suspend fun addKnowledge(node: com.aris.voice.domain.KnowledgeNode): com.aris.voice.core.ArisResult<Unit> {
+        nodes[node.knowledgeId] = node
+        return com.aris.voice.core.ArisResult.Success(Unit)
+    }
+
+    override suspend fun retrieveKnowledge(knowledgeId: String): com.aris.voice.core.ArisResult<com.aris.voice.domain.KnowledgeNode?> {
+        val node = nodes[knowledgeId]
+        if (node != null && !node.isArchived) {
+            return com.aris.voice.core.ArisResult.Success(node)
+        }
+        return com.aris.voice.core.ArisResult.Success(null)
+    }
+
+    override suspend fun updateKnowledge(node: com.aris.voice.domain.KnowledgeNode): com.aris.voice.core.ArisResult<Unit> {
+        if (nodes.containsKey(node.knowledgeId)) {
+            nodes[node.knowledgeId] = node.copy(updatedTimestamp = System.currentTimeMillis())
+            return com.aris.voice.core.ArisResult.Success(Unit)
+        }
+        return com.aris.voice.core.ArisResult.Failure(com.aris.voice.core.ArisError.BrainError("NOT_FOUND", "Knowledge node not found"))
+    }
+
+    override suspend fun archiveKnowledge(knowledgeId: String): com.aris.voice.core.ArisResult<Unit> {
+        val node = nodes[knowledgeId]
+        if (node != null) {
+            nodes[knowledgeId] = node.copy(isArchived = true, updatedTimestamp = System.currentTimeMillis())
+            return com.aris.voice.core.ArisResult.Success(Unit)
+        }
+        return com.aris.voice.core.ArisResult.Failure(com.aris.voice.core.ArisError.BrainError("NOT_FOUND", "Knowledge node not found"))
+    }
+
+    override suspend fun searchKnowledge(query: String): com.aris.voice.core.ArisResult<com.aris.voice.domain.KnowledgeQueryResult> {
+        val lowercaseQuery = query.lowercase()
+        val matchedNodes = nodes.values.filter { 
+            !it.isArchived && 
+            (it.name.lowercase().contains(lowercaseQuery) || 
+             it.description.lowercase().contains(lowercaseQuery) || 
+             it.tags.any { tag -> tag.lowercase().contains(lowercaseQuery) })
+        }
+        
+        val matchedNodeIds = matchedNodes.map { it.knowledgeId }.toSet()
+        val matchedRelations = relations.filter { 
+            matchedNodeIds.contains(it.sourceNodeId) && matchedNodeIds.contains(it.targetNodeId)
+        }
+        
+        val graph = com.aris.voice.domain.KnowledgeGraph(matchedNodes, matchedRelations)
+        
+        val result = com.aris.voice.domain.KnowledgeQueryResult(
+            query = query,
+            nodes = matchedNodes,
+            graph = graph
+        )
+        return com.aris.voice.core.ArisResult.Success(result)
+    }
+
+    override suspend fun addRelation(relation: com.aris.voice.domain.KnowledgeRelation): com.aris.voice.core.ArisResult<Unit> {
+        if (!nodes.containsKey(relation.sourceNodeId) || !nodes.containsKey(relation.targetNodeId)) {
+            return com.aris.voice.core.ArisResult.Failure(com.aris.voice.core.ArisError.BrainError("NOT_FOUND", "Source or target node does not exist"))
+        }
+        
+        // check if relationship already exists
+        val exists = relations.any { 
+            it.sourceNodeId == relation.sourceNodeId && 
+            it.targetNodeId == relation.targetNodeId && 
+            it.relationType == relation.relationType 
+        }
+        
+        if (!exists) {
+            relations.add(relation)
+        }
+        return com.aris.voice.core.ArisResult.Success(Unit)
+    }
+
+    override suspend fun traverseRelationships(startNodeId: String, depth: Int): com.aris.voice.core.ArisResult<com.aris.voice.domain.KnowledgeGraph> {
+        val resultNodes = mutableSetOf<com.aris.voice.domain.KnowledgeNode>()
+        val resultRelations = mutableSetOf<com.aris.voice.domain.KnowledgeRelation>()
+        val visitedIds = mutableSetOf<String>()
+        val queue = mutableListOf(Pair(startNodeId, 0))
+        
+        val startNode = nodes[startNodeId]
+        if (startNode != null && !startNode.isArchived) {
+            resultNodes.add(startNode)
+        } else {
+            return com.aris.voice.core.ArisResult.Failure(com.aris.voice.core.ArisError.BrainError("NOT_FOUND", "Start node not found or archived"))
+        }
+        
+        while (queue.isNotEmpty()) {
+            val (currentId, currentDepth) = queue.removeAt(0)
+            
+            if (currentDepth >= depth || visitedIds.contains(currentId)) continue
+            visitedIds.add(currentId)
+            
+            val nodeRelations = relations.filter { it.sourceNodeId == currentId || it.targetNodeId == currentId }
+            
+            for (relation in nodeRelations) {
+                val neighborId = if (relation.sourceNodeId == currentId) relation.targetNodeId else relation.sourceNodeId
+                val neighborNode = nodes[neighborId]
+                
+                if (neighborNode != null && !neighborNode.isArchived) {
+                    resultNodes.add(neighborNode)
+                    resultRelations.add(relation)
+                    queue.add(Pair(neighborId, currentDepth + 1))
+                }
+            }
+        }
+        
+        val graph = com.aris.voice.domain.KnowledgeGraph(resultNodes.toList(), resultRelations.toList())
+        return com.aris.voice.core.ArisResult.Success(graph)
     }
 }

@@ -64,7 +64,7 @@ class MemoriesActivity : AppCompatActivity() {
         addMemoryFab = findViewById(R.id.addMemoryFab)
         
         // Setup privacy card click listener
-        val privacyCard = findViewById<com.google.android.material.card.MaterialCardView>(R.id.privacyCard)
+        val privacyCard = findViewById<android.widget.LinearLayout>(R.id.privacyCard)
         privacyCard.setOnClickListener {
             val intent = Intent(this, PrivacyActivity::class.java)
             startActivity(intent)

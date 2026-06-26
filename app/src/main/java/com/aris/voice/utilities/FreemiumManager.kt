@@ -18,10 +18,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import java.util.Calendar
 
 class FreemiumManager {
 
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val db = Firebase.firestore
     private val auth = Firebase.auth
     private val billingClient: BillingClient = MyApplication.billingClient
@@ -294,7 +296,7 @@ class FreemiumManager {
 
         // Sync Firestore in background silently
         MyApplication.appContext.let { _ ->
-            CoroutineScope(Dispatchers.IO).launch {
+            scope.launch {
                 try {
                     val userDocRef = db.collection("users").document(currentUser.uid)
                     db.runTransaction { transaction ->

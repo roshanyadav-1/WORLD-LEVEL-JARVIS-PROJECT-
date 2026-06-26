@@ -117,7 +117,11 @@ class MyApplication : Application(), PurchasesUpdatedListener {
         ArisServiceRegistry.register(IAccessibilityParser::class.java, perception)
         ArisServiceRegistry.register(IDeviceStateMonitor::class.java, perception)
 
-        val actions = ActionImpl(this, null)
+        val finger = com.aris.voice.api.Finger(this)
+        val actionAdapter = com.aris.voice.adapters.ActionAdapterImpl(this, finger)
+        ArisServiceRegistry.register(com.aris.voice.adapters.IActionAdapter::class.java, actionAdapter)
+
+        val actions = ActionImpl(this, actionAdapter)
         ArisServiceRegistry.register(IActionExecutor::class.java, actions)
         ArisServiceRegistry.register(IGestureExecutor::class.java, actions)
         ArisServiceRegistry.register(ISystemActionExecutor::class.java, actions)
@@ -134,6 +138,9 @@ class MyApplication : Application(), PurchasesUpdatedListener {
         val learning = LearningImpl()
         ArisServiceRegistry.register(IReflectionEngine::class.java, learning)
         ArisServiceRegistry.register(IPatternLearner::class.java, learning)
+        
+        val learningEngine = LearningEngineImpl()
+        ArisServiceRegistry.register(ILearningEngine::class.java, learningEngine)
 
         val toolRegistry = ToolRegistryImpl()
         ArisServiceRegistry.register(IToolRegistry::class.java, toolRegistry)
@@ -146,26 +153,115 @@ class MyApplication : Application(), PurchasesUpdatedListener {
         ArisServiceRegistry.register(IWakeWordDetector::class.java, audio)
         ArisServiceRegistry.register(ISpeechRecognizer::class.java, audio)
 
+        // Providers
+        val deviceStateProvider = com.aris.voice.brain.world.providers.DeviceStateProviderImpl(this)
+        val uiStateProvider = com.aris.voice.brain.world.providers.UiStateProviderImpl(this)
+        val environmentProvider = com.aris.voice.brain.world.providers.EnvironmentProviderImpl(this)
+        val taskStateProvider = com.aris.voice.brain.world.providers.TaskStateProviderImpl()
+        val capabilityStateProvider = com.aris.voice.brain.world.providers.CapabilityStateProviderImpl(this)
+
+        ArisServiceRegistry.register(com.aris.voice.brain.world.providers.IDeviceStateProvider::class.java, deviceStateProvider)
+        ArisServiceRegistry.register(com.aris.voice.brain.world.providers.IUiStateProvider::class.java, uiStateProvider)
+        ArisServiceRegistry.register(com.aris.voice.brain.world.providers.IEnvironmentProvider::class.java, environmentProvider)
+        ArisServiceRegistry.register(com.aris.voice.brain.world.providers.ITaskStateProvider::class.java, taskStateProvider)
+        ArisServiceRegistry.register(com.aris.voice.brain.world.providers.ICapabilityStateProvider::class.java, capabilityStateProvider)
+
         // Brain
         val intentAnalyzer = IntentAnalyzerImpl()
-        val worldModel = WorldModelImpl()
+        val worldModel = WorldModelImpl(
+            deviceStateProvider = deviceStateProvider,
+            uiStateProvider = uiStateProvider,
+            environmentProvider = environmentProvider,
+            taskStateProvider = taskStateProvider,
+            capabilityStateProvider = capabilityStateProvider
+        )
         val contextBuilder = ContextBuilderImpl(worldModel)
+        
+        val executionOrchestrator = ExecutionOrchestratorImpl(actions, worldModel)
+        ArisServiceRegistry.register(IExecutionOrchestrator::class.java, executionOrchestrator)
         val taskPlanner = TaskPlannerImpl()
         val reasoningEngine = ReasoningEngineImpl()
         val riskValidator = RiskValidatorImpl()
         val toolSelector = ToolSelectorImpl()
         val decisionEngine = DecisionEngineImpl()
         val skillEngine = SkillEngineImpl()
-        val orchestrator = BrainOrchestratorImpl(
-            intentAnalyzer,
-            contextBuilder,
-            worldModel,
-            taskPlanner,
-            reasoningEngine,
-            riskValidator,
-            toolSelector,
-            decisionEngine
+        val memoryEngine = MemoryEngineImpl()
+        val experienceEngine = ExperienceEngineImpl()
+        ArisServiceRegistry.register(com.aris.voice.brain.IExperienceEngine::class.java, experienceEngine)
+        val knowledgeEngine = KnowledgeEngineImpl()
+        ArisServiceRegistry.register(com.aris.voice.brain.IKnowledgeEngine::class.java, knowledgeEngine)
+        val llmBridge = com.aris.voice.llm.LlmBridgeImpl()
+        ArisServiceRegistry.register(com.aris.voice.llm.ILlmBridge::class.java, llmBridge)
+        
+        val voiceAdapter = com.aris.voice.adapters.VoiceAdapterImpl(this)
+        ArisServiceRegistry.register(com.aris.voice.adapters.IVoiceAdapter::class.java, voiceAdapter)
+        
+        val triggerAdapter = com.aris.voice.adapters.TriggerAdapterImpl(this)
+        ArisServiceRegistry.register(com.aris.voice.adapters.ITriggerAdapter::class.java, triggerAdapter)
+        
+        val overlayAdapter = com.aris.voice.adapters.OverlayAdapterImpl(this)
+        ArisServiceRegistry.register(com.aris.voice.adapters.IOverlayAdapter::class.java, overlayAdapter)
+        
+        val memoryStorageAdapter = com.aris.voice.adapters.MemoryStorageAdapterImpl(this)
+        ArisServiceRegistry.register(com.aris.voice.adapters.IMemoryStorageAdapter::class.java, memoryStorageAdapter)
+        
+        val accessibilityAdapter = com.aris.voice.adapters.AccessibilityAdapterImpl(this)
+        ArisServiceRegistry.register(com.aris.voice.adapters.IAccessibilityAdapter::class.java, accessibilityAdapter)
+        
+        val legacyGeminiProvider = com.aris.voice.adapters.LegacyGeminiProviderAdapter(this)
+        llmBridge.registerProvider(legacyGeminiProvider)
+        
+        val audioRuntimeManager = com.aris.voice.runtime.AudioRuntimeManagerImpl(
+            object : com.aris.voice.runtime.IAudioProvider {
+                override suspend fun startAudioSession() = com.aris.voice.core.ArisResult.Success(Unit)
+                override suspend fun stopAudioSession() = com.aris.voice.core.ArisResult.Success(Unit)
+            }
         )
+        ArisServiceRegistry.register(com.aris.voice.runtime.IAudioRuntimeManager::class.java, audioRuntimeManager)
+
+        val speechInputProcessor = com.aris.voice.runtime.SpeechInputProcessorImpl(
+            com.aris.voice.runtime.providers.LegacySTTProviderAdapter(this)
+        )
+        ArisServiceRegistry.register(com.aris.voice.runtime.ISpeechInputProcessor::class.java, speechInputProcessor)
+
+        val voiceConversationManager = com.aris.voice.runtime.VoiceConversationManagerImpl()
+        ArisServiceRegistry.register(com.aris.voice.runtime.IVoiceConversationManager::class.java, voiceConversationManager)
+
+        val speechOutputProcessor = com.aris.voice.runtime.SpeechOutputProcessorImpl(
+            com.aris.voice.runtime.providers.LegacyTTSProviderAdapter(this)
+        )
+        ArisServiceRegistry.register(com.aris.voice.runtime.ISpeechOutputProcessor::class.java, speechOutputProcessor)
+        
+        val orchestrator = BrainOrchestratorImpl(
+            intentAnalyzer = intentAnalyzer,
+            contextBuilder = contextBuilder,
+            worldModel = worldModel,
+            taskPlanner = taskPlanner,
+            reasoningEngine = reasoningEngine,
+            riskValidator = riskValidator,
+            toolSelector = toolSelector,
+            decisionEngine = decisionEngine,
+            experienceEngine = experienceEngine,
+            reflectionEngine = learning, // was named learning above
+            learningEngine = learningEngine,
+            knowledgeEngine = knowledgeEngine
+        )
+        
+        val voiceOrchestrator = com.aris.voice.runtime.VoiceOrchestratorImpl(
+            audioRuntimeManager,
+            speechInputProcessor,
+            voiceConversationManager,
+            speechOutputProcessor,
+            orchestrator,
+            executionOrchestrator
+        )
+        ArisServiceRegistry.register(com.aris.voice.runtime.IVoiceOrchestrator::class.java, voiceOrchestrator)
+
+        val voiceSessionManager = com.aris.voice.runtime.VoiceSessionManagerImpl(
+            voiceOrchestrator,
+            voiceConversationManager
+        )
+        ArisServiceRegistry.register(com.aris.voice.runtime.IVoiceSessionManager::class.java, voiceSessionManager)
 
         ArisServiceRegistry.register(IIntentAnalyzer::class.java, intentAnalyzer)
         ArisServiceRegistry.register(IContextBuilder::class.java, contextBuilder)
@@ -176,6 +272,9 @@ class MyApplication : Application(), PurchasesUpdatedListener {
         ArisServiceRegistry.register(IToolSelector::class.java, toolSelector)
         ArisServiceRegistry.register(IDecisionEngine::class.java, decisionEngine)
         ArisServiceRegistry.register(ISkillEngine::class.java, skillEngine)
+        ArisServiceRegistry.register(IMemoryEngine::class.java, memoryEngine)
+        ArisServiceRegistry.register(IExperienceEngine::class.java, experienceEngine)
+        ArisServiceRegistry.register(IKnowledgeEngine::class.java, knowledgeEngine)
         ArisServiceRegistry.register(IBrainOrchestrator::class.java, orchestrator)
 
         logger.i("MyApplication", "All Project ARIS cognitive platform services successfully registered in ArisServiceRegistry.")
@@ -224,6 +323,7 @@ class MyApplication : Application(), PurchasesUpdatedListener {
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
         Logger.d("MyApplication", "Purchase update received")
         val intent = Intent("com.aris.voice.PURCHASE_UPDATED")
+        intent.setPackage(packageName)
         intent.putExtra("response_code", billingResult.responseCode)
         intent.putExtra("debug_message", billingResult.debugMessage)
         appContext.sendBroadcast(intent)

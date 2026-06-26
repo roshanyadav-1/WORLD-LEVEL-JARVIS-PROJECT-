@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
@@ -16,6 +17,8 @@ import kotlin.coroutines.resume
  * This class handles the communication between the agent and user for interactive tasks
  */
 class UserInputManager(private val context: Context) {
+    
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     
     companion object {
         private const val TAG = "UserInputManager"
@@ -64,7 +67,7 @@ class UserInputManager(private val context: Context) {
                 Log.d(TAG, "Starting speech recognition for user response...")
                 
                 // Start speech recognition with multiple attempts
-                CoroutineScope(Dispatchers.Main).launch {
+                scope.launch {
                     try {
                         var response: String? = null
                         var attempt = 1
@@ -82,7 +85,7 @@ class UserInputManager(private val context: Context) {
                             
                             response = suspendCancellableCoroutine<String> { speechContinuation ->
                                 // Use a separate coroutine to call the suspend function
-                                CoroutineScope(Dispatchers.Main).launch {
+                                scope.launch {
                                     try {
                                         withTimeoutOrNull(SPEECH_TIMEOUT_MS) {
                                             speechCoordinator.startListening(
@@ -149,7 +152,7 @@ class UserInputManager(private val context: Context) {
      * @param question The original question
      */
     private fun useFallbackResponse(question: String) {
-        CoroutineScope(Dispatchers.Main).launch {
+        scope.launch {
             delay(FALLBACK_TIMEOUT_MS) // Give user time to read the question
             val fallbackResponse = "User provided fallback response after $MAX_SPEECH_ATTEMPTS failed speech recognition attempts for: $question"
             Log.d(TAG, "Using fallback response: $fallbackResponse")

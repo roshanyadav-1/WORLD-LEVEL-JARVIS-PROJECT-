@@ -113,7 +113,7 @@ class PlanExecutorImpl(
 
 class ActionImpl(
     private val context: Context,
-    private val finger: Finger? = null
+    private val actionAdapter: com.aris.voice.adapters.IActionAdapter
 ) : IActionExecutor, IGestureExecutor, ISystemActionExecutor, IAppLauncher {
 
     private val TAG = "ArisActionImpl"
@@ -122,44 +122,11 @@ class ActionImpl(
     override suspend fun executeStep(step: PlanStep): ArisResult<String> {
         Log.d(TAG, "Executing plan step: ${step.stepId} - ${step.description}")
         return try {
-            val resultMsg = when (step.requiredCapability.uppercase()) {
-                "CLICK" -> {
-                    val x = step.arguments["x"]?.toIntOrNull() ?: 0
-                    val y = step.arguments["y"]?.toIntOrNull() ?: 0
-                    performClick(x, y).getOrThrow()
-                    "Clicked coordinates ($x, $y) successfully"
-                }
-                "SWIPE" -> {
-                    val startX = step.arguments["startX"]?.toIntOrNull() ?: 0
-                    val startY = step.arguments["startY"]?.toIntOrNull() ?: 0
-                    val endX = step.arguments["endX"]?.toIntOrNull() ?: 0
-                    val endY = step.arguments["endY"]?.toIntOrNull() ?: 0
-                    performSwipe(startX, startY, endX, endY, 500).getOrThrow()
-                    "Swiped from ($startX, $startY) to ($endX, $endY) successfully"
-                }
-                "TYPE" -> {
-                    val text = step.arguments["text"] ?: ""
-                    performType(text).getOrThrow()
-                    "Typed text: '$text' successfully"
-                }
-                "BACK" -> {
-                    performBack().getOrThrow()
-                    "Performed system Back action"
-                }
-                "HOME" -> {
-                    performHome().getOrThrow()
-                    "Performed system Home action"
-                }
-                "LAUNCH_APP" -> {
-                    val packageName = step.arguments["packageName"] ?: ""
-                    launchApp(packageName).getOrThrow()
-                    "Launched application: $packageName"
-                }
-                else -> {
-                    "Simulated execution of tool: ${step.requiredCapability}"
-                }
+            val result = actionAdapter.executeAction(step.requiredCapability, step.arguments)
+            when (result) {
+                is ArisResult.Success -> ArisResult.Success(result.value.toString())
+                is ArisResult.Failure -> ArisResult.Failure(result.error)
             }
-            ArisResult.Success(resultMsg)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("STEP_EXECUTION_FAILED", "Failed executing ${step.requiredCapability}", e))
         }
@@ -168,13 +135,8 @@ class ActionImpl(
     // IGestureExecutor
     override suspend fun performClick(x: Int, y: Int): ArisResult<Unit> {
         return try {
-            if (finger != null) {
-                finger.tap(x, y)
-                ArisResult.Success(Unit)
-            } else {
-                Log.i(TAG, "Click gesture simulated at ($x, $y)")
-                ArisResult.Success(Unit)
-            }
+            val result = actionAdapter.executeAction("CLICK", mapOf("x" to x, "y" to y))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("CLICK_FAILED", "Failed click gesture", e))
         }
@@ -182,13 +144,8 @@ class ActionImpl(
 
     override suspend fun performSwipe(startX: Int, startY: Int, endX: Int, endY: Int, durationMs: Long): ArisResult<Unit> {
         return try {
-            if (finger != null) {
-                finger.swipe(startX, startY, endX, endY, durationMs.toInt())
-                ArisResult.Success(Unit)
-            } else {
-                Log.i(TAG, "Swipe gesture simulated from ($startX, $startY) to ($endX, $endY)")
-                ArisResult.Success(Unit)
-            }
+            val result = actionAdapter.executeAction("SWIPE", mapOf("startX" to startX, "startY" to startY, "endX" to endX, "endY" to endY))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("SWIPE_FAILED", "Failed swipe gesture", e))
         }
@@ -196,8 +153,8 @@ class ActionImpl(
 
     override suspend fun performScroll(direction: String): ArisResult<Unit> {
         return try {
-            Log.i(TAG, "Scroll gesture simulated: $direction")
-            ArisResult.Success(Unit)
+            val result = actionAdapter.executeAction("SCROLL", mapOf("direction" to direction))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("SCROLL_FAILED", "Failed scroll gesture", e))
         }
@@ -205,13 +162,8 @@ class ActionImpl(
 
     override suspend fun performType(text: String): ArisResult<Unit> {
         return try {
-            if (finger != null) {
-                finger.type(text)
-                ArisResult.Success(Unit)
-            } else {
-                Log.i(TAG, "Type keyboard simulation: '$text'")
-                ArisResult.Success(Unit)
-            }
+            val result = actionAdapter.executeAction("TYPE", mapOf("text" to text))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("TYPE_FAILED", "Failed type keyboard gesture", e))
         }
@@ -220,13 +172,8 @@ class ActionImpl(
     // ISystemActionExecutor
     override suspend fun performBack(): ArisResult<Unit> {
         return try {
-            if (finger != null) {
-                finger.back()
-                ArisResult.Success(Unit)
-            } else {
-                Log.i(TAG, "Back action simulated")
-                ArisResult.Success(Unit)
-            }
+            val result = actionAdapter.executeAction("BACK", emptyMap())
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("BACK_FAILED", "Failed back action", e))
         }
@@ -234,39 +181,36 @@ class ActionImpl(
 
     override suspend fun performHome(): ArisResult<Unit> {
         return try {
-            if (finger != null) {
-                finger.home()
-                ArisResult.Success(Unit)
-            } else {
-                Log.i(TAG, "Home action simulated")
-                ArisResult.Success(Unit)
-            }
+            val result = actionAdapter.executeAction("HOME", emptyMap())
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("HOME_FAILED", "Failed home action", e))
         }
     }
 
     override suspend fun toggleSetting(settingKey: String, enable: Boolean): ArisResult<Unit> {
-        Log.i(TAG, "Toggle setting $settingKey -> $enable")
-        return ArisResult.Success(Unit)
+        return try {
+            val result = actionAdapter.executeAction("TOGGLE_SETTING", mapOf("settingKey" to settingKey, "enable" to enable))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
+        } catch (e: Exception) {
+            ArisResult.Failure(ArisError.ExecutionError("TOGGLE_SETTING_FAILED", "Failed to toggle setting $settingKey", e))
+        }
     }
 
     override suspend fun controlMedia(command: String): ArisResult<Unit> {
-        Log.i(TAG, "Control media command: $command")
-        return ArisResult.Success(Unit)
+        return try {
+            val result = actionAdapter.executeAction("CONTROL_MEDIA", mapOf("command" to command))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
+        } catch (e: Exception) {
+            ArisResult.Failure(ArisError.ExecutionError("CONTROL_MEDIA_FAILED", "Failed to control media with command $command", e))
+        }
     }
 
     // IAppLauncher
     override suspend fun launchApp(packageName: String): ArisResult<Unit> {
         return try {
-            val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-            if (launchIntent != null) {
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(launchIntent)
-                ArisResult.Success(Unit)
-            } else {
-                ArisResult.Failure(ArisError.ExecutionError("APP_NOT_FOUND", "App package $packageName not found on device"))
-            }
+            val result = actionAdapter.executeAction("LAUNCH_APP", mapOf("packageName" to packageName))
+            if (result is ArisResult.Success) ArisResult.Success(Unit) else ArisResult.Failure((result as ArisResult.Failure).error)
         } catch (e: Exception) {
             ArisResult.Failure(ArisError.ExecutionError("LAUNCH_APP_FAILED", "Error launching app: $packageName", e))
         }

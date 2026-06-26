@@ -16,9 +16,9 @@ import com.aris.voice.BuildConfig
 import com.aris.voice.utilities.NetworkConnectivityManager
 import com.aris.voice.utilities.NetworkNotifier
 import java.util.concurrent.TimeUnit
-import java.time.LocalTime
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class SearchResult(
     val title: String,
@@ -216,14 +216,14 @@ object TavilyApi {
         return searchIndicators.any { userInput.lowercase().contains(it) }
     }
 
-    private val timeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
-    private val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
+    private val timeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    private val dateFormatter = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
 
     private val offlineKnowledge = mapOf(
-        "what time is it" to { "The time is ${LocalTime.now().format(timeFormatter)}" },
-        "what's the time" to { "The time is ${LocalTime.now().format(timeFormatter)}" },
-        "today's date" to { "Today is ${LocalDate.now().format(dateFormatter)}" },
-        "what is the date" to { "Today is ${LocalDate.now().format(dateFormatter)}" }
+        "what time is it" to { "The time is ${timeFormatter.format(Date())}" },
+        "what's the time" to { "The time is ${timeFormatter.format(Date())}" },
+        "today's date" to { "Today is ${dateFormatter.format(Date())}" },
+        "what is the date" to { "Today is ${dateFormatter.format(Date())}" }
     )
 
     fun answerOffline(query: String): String? {

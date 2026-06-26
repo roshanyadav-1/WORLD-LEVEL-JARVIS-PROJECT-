@@ -14,19 +14,19 @@ class ChooseTriggerTypeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_choose_trigger_type)
         com.aris.voice.utilities.ThemeManager.applyTheme(this)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        findViewById<android.widget.ImageView>(R.id.btn_back).setOnClickListener {
+            onBackPressed()
+        }
 
-        findViewById<CardView>(R.id.scheduledTimeCard).setOnClickListener {
+        findViewById<android.widget.LinearLayout>(R.id.scheduledTimeCard).setOnClickListener {
             launchCreateTriggerActivity(TriggerType.SCHEDULED_TIME)
         }
 
-        findViewById<CardView>(R.id.notificationCard).setOnClickListener {
+        findViewById<android.widget.LinearLayout>(R.id.notificationCard).setOnClickListener {
             launchCreateTriggerActivity(TriggerType.NOTIFICATION)
         }
 
-        findViewById<CardView>(R.id.chargingStateCard).setOnClickListener {
+        findViewById<android.widget.LinearLayout>(R.id.chargingStateCard).setOnClickListener {
             launchCreateTriggerActivity(TriggerType.CHARGING_STATE)
         }
     }

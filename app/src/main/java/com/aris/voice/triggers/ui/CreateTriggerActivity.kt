@@ -60,9 +60,9 @@ class CreateTriggerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_trigger)
         com.aris.voice.utilities.ThemeManager.applyTheme(this)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        findViewById<android.widget.ImageView>(R.id.btn_back).setOnClickListener {
+            onBackPressed()
+        }
 
         triggerManager = TriggerManager.getInstance(this)
         triggerTypeSpinner = findViewById(R.id.triggerTypeSpinner)

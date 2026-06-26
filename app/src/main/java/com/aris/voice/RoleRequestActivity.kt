@@ -1,5 +1,6 @@
 package com.aris.voice
 
+import android.annotation.SuppressLint
 import android.app.role.RoleManager
 import android.content.Intent
 import android.os.Build
@@ -11,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 
+@SuppressLint("NewApi")
 class RoleRequestActivity : AppCompatActivity() {
 
     private var launched = false

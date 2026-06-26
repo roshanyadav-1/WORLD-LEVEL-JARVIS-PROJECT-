@@ -386,7 +386,7 @@ class SettingsActivity : BaseNavigationActivity() {
                 setPadding(paddingLeft, 4, paddingRight, 4)
                 
                 try {
-                    val font = resources.getFont(R.font.oxanium)
+                    val font = androidx.core.content.res.ResourcesCompat.getFont(this@SettingsActivity, R.font.oxanium)
                     typeface = font
                 } catch (e: Exception) {
                     typeface = android.graphics.Typeface.MONOSPACE

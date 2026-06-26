@@ -40,13 +40,13 @@ class UserIdManager(context: Context) {
 
         return if (existingId != null) {
             // If the ID exists, we're done. Return it.
-            println("UserIdManager: Existing user ID found: $existingId")
+            android.util.Log.d("UserIdManager", "Existing user ID found: $existingId")
             existingId
         } else {
             // If the ID is null, this is the first launch.
             // 1. Generate a new, random, and unique ID.
             val newId = UUID.randomUUID().toString()
-            println("UserIdManager: No existing ID found. Creating new ID: $newId")
+            android.util.Log.d("UserIdManager", "No existing ID found. Creating new ID: $newId")
 
             // 2. Save the new ID to SharedPreferences for future launches.
             // We use .apply() which saves the data asynchronously in the background.

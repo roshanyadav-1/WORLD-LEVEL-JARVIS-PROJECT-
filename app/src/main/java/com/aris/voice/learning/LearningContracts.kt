@@ -8,9 +8,12 @@ import com.aris.voice.domain.Decision
  */
 interface IReflectionEngine {
     /**
-     * Evaluates the completed decision against the actual environmental result.
+     * Evaluates the accumulated ExperienceRecords and identifies improvements.
      */
-    suspend fun reflect(decision: Decision, executionResult: String, success: Boolean): ArisResult<String>
+    suspend fun reflectOnExperience(
+        experiences: List<com.aris.voice.domain.ExperienceRecord>,
+        summary: com.aris.voice.domain.ExperienceSummary
+    ): ArisResult<com.aris.voice.domain.ReflectionReport>
 }
 
 /**
@@ -21,4 +24,14 @@ interface IPatternLearner {
      * Analyzes execution logs over time to extract and learn highly repetitive task sequences.
      */
     suspend fun extractRecurringWorkflow(historyLogsJson: String): ArisResult<String?>
+}
+
+/**
+ * Interface to evaluate reflection reports and experiences to generate learning proposals.
+ */
+interface ILearningEngine {
+    suspend fun evaluateLearningOpportunity(
+        report: com.aris.voice.domain.ReflectionReport,
+        summary: com.aris.voice.domain.ExperienceSummary
+    ): ArisResult<com.aris.voice.domain.LearningDecision>
 }

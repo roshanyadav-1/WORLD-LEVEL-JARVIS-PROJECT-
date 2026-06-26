@@ -51,7 +51,7 @@ class MemoryService {
                     put("messages", messagesArray)
                     put("user_id", userId)
                 }
-                println("Payload being sent to Mem0: ${payload.toString(2)}") // Pretty print JSON
+                android.util.Log.d("MemoryService", "Payload being sent to Mem0: ${payload.toString(2)}")
 
                 val request = Request.Builder()
                     .url("https://api.mem0.ai/v1/memories/")

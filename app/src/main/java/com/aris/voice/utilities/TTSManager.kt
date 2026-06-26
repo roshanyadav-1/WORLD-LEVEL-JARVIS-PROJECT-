@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.cancellation.CancellationException
 import java.io.File
 import java.security.MessageDigest
@@ -52,6 +53,7 @@ class TTSManager private constructor(private val context: Context) : TextToSpeec
     }
 
     // --- NEW: Caching System ---
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val cacheDir by lazy { File(context.cacheDir, "tts_cache") }
     private val cache = ConcurrentHashMap<String, CachedAudio>()
     private val accessOrder = LinkedBlockingDeque<String>()
@@ -403,7 +405,7 @@ class TTSManager private constructor(private val context: Context) : TextToSpeec
         }
         
         // Start background preloading for remaining chunks
-        val preloadJob = CoroutineScope(Dispatchers.IO).launch {
+        val preloadJob = scope.launch {
             for (i in 1 until textChunks.size) {
                 val chunk = textChunks[i].trim()
                 if (chunk.isNotEmpty()) {

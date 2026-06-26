@@ -126,7 +126,7 @@ class HybridAutomationActivity : BaseNavigationActivity() {
                 textSize = 10f
                 setPadding(0, (8 * density).toInt(), 0, (4 * density).toInt())
                 try {
-                    val font = resources.getFont(R.font.oxanium)
+                    val font = androidx.core.content.res.ResourcesCompat.getFont(this@HybridAutomationActivity, R.font.oxanium)
                     typeface = font
                 } catch (e: Exception) {
                     // Ignore
@@ -150,7 +150,7 @@ class HybridAutomationActivity : BaseNavigationActivity() {
                     bottomMargin = (8 * density).toInt()
                 }
                 try {
-                    val font = resources.getFont(R.font.oxanium)
+                    val font = androidx.core.content.res.ResourcesCompat.getFont(this@HybridAutomationActivity, R.font.oxanium)
                     typeface = font
                 } catch (e: Exception) {
                     // Ignore

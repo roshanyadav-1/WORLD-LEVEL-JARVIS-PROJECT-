@@ -11,6 +11,7 @@ import com.aris.voice.api.TTSVoice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -44,6 +45,7 @@ class SpeechCoordinator private constructor(private val context: Context) {
     // State tracking using thread-safe AtomicBoolean
     private val isSpeaking = AtomicBoolean(false)
     private val isListening = AtomicBoolean(false)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private fun requestAudioFocus(): Boolean {
         return try {
@@ -121,7 +123,7 @@ class SpeechCoordinator private constructor(private val context: Context) {
         
         delay(100) // Brief delay for cancellation cleanup
 
-        val job = CoroutineScope(Dispatchers.IO).launch {
+        val job = scope.launch {
             try {
                 requestAudioFocus()
                 if (isListening.get()) {
@@ -155,7 +157,7 @@ class SpeechCoordinator private constructor(private val context: Context) {
      */
     suspend fun playAudioData(data: ByteArray) {
         ttsPlaybackJob?.cancel(CancellationException("New audio data request received"))
-        ttsPlaybackJob = CoroutineScope(Dispatchers.IO).launch {
+        ttsPlaybackJob = scope.launch {
             speechMutex.withLock {
                 try {
                     requestAudioFocus()
@@ -181,7 +183,7 @@ class SpeechCoordinator private constructor(private val context: Context) {
      */
     suspend fun testVoice(text: String, voice: TTSVoice) {
         ttsPlaybackJob?.cancel(CancellationException("New voice test request received"))
-        ttsPlaybackJob = CoroutineScope(Dispatchers.IO).launch {
+        ttsPlaybackJob = scope.launch {
             speechMutex.withLock {
                 try {
                     requestAudioFocus()

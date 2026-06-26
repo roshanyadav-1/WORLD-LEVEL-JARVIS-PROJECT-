@@ -10,6 +10,7 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
@@ -39,7 +40,7 @@ class STTManager private constructor(private val context: Context) {
     
     // Silence/VAD Timers Configuration
     private var silenceTimeoutJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private fun isComponentAvailableAndActive(component: android.content.ComponentName): Boolean {
         return try {

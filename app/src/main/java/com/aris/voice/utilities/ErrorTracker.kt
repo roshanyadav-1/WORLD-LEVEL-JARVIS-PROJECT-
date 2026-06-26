@@ -55,7 +55,7 @@ object ErrorTracker {
         val error = SystemError(module, message, System.currentTimeMillis(), severity, technicalDetails)
         errors.add(0, error)
         if (errors.size > maxErrors) {
-            errors.removeLast()
+            errors.removeAt(errors.lastIndex)
         }
         
         // Update status of that module

@@ -58,7 +58,7 @@ class MomentsFragment : Fragment() {
             return
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
             try {
                 val document = db.collection("users").document(currentUser.uid).get().await()
                 if (document.exists()) {
