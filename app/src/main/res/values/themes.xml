@@ -19,7 +19,7 @@
         
         <!-- Force light status bar content on dark background -->
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
     </style>
 
     <style name="PermissionHeading" parent="Widget.AppCompat.TextView">

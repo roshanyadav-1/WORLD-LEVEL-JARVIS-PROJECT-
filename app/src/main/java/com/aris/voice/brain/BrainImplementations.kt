@@ -439,6 +439,14 @@ class DecisionEngineImpl : IDecisionEngine {
             needsClarification = true
             clarificationQuestion = "Who do you want to call?"
         }
+        if (strategy.type == com.aris.voice.domain.StrategyType.OPEN_APPLICATION && intent.targetApplication.isNullOrEmpty()) {
+            needsClarification = true
+            clarificationQuestion = "Which application do you want to open?"
+        }
+        if (strategy.type == com.aris.voice.domain.StrategyType.CHANGE_SETTINGS && intent.targetEntity.isNullOrEmpty()) {
+            needsClarification = true
+            clarificationQuestion = "Which setting do you want to change?"
+        }
         
         val dangerousKeywords = listOf("delete", "uninstall", "format", "pay", "buy", "factory reset", "emergency")
         requiresConfirmation = plan.steps.any { step ->
@@ -500,6 +508,18 @@ class DecisionEngineImpl : IDecisionEngine {
             )
         }
         
+        if (strategy.type == com.aris.voice.domain.StrategyType.FALLBACK) {
+            return com.aris.voice.domain.Decision(
+                decisionId = UUID.randomUUID().toString(),
+                type = com.aris.voice.domain.DecisionType.USE_CLOUD_LLM,
+                reason = "Conversational input requires LLM fallback.",
+                confidence = intent.confidenceScore,
+                riskLevel = riskLevel,
+                canContinue = false,
+                plan = plan
+            )
+        }
+        
         if (intent.confidenceScore < 0.5f) {
             return com.aris.voice.domain.Decision(
                 decisionId = UUID.randomUUID().toString(),
@@ -507,7 +527,7 @@ class DecisionEngineImpl : IDecisionEngine {
                 reason = "Low confidence in user intent.",
                 confidence = intent.confidenceScore,
                 riskLevel = riskLevel,
-                clarificationQuestion = "I'm not sure I understood completely. Could you rephrase that?",
+                clarificationQuestion = "I'm not sure I understood completely. Could you clarify what you want to do?",
                 canContinue = false,
                 plan = plan
             )
@@ -593,6 +613,10 @@ class BrainOrchestratorImpl(
             this.lastStrategy = strategy
             this.lastDecision = decision
             this.lastWorldModelData = worldModel.getWorldModelData()
+
+            if (decision.type == com.aris.voice.domain.DecisionType.USE_CLOUD_LLM) {
+                return ArisResult.Failure(ArisError.BrainError("DELEGATE_TO_LLM", "Intent requires conversational LLM fallback", null))
+            }
 
             // For now, return the initial decision. A future module might use reasoningResult to alter the decision.
             ArisResult.Success(decision)
