@@ -385,7 +385,7 @@ class ToolSelectorImpl : IToolSelector {
 }
 
 class DecisionEngineImpl : IDecisionEngine {
-    override fun evaluate(
+    override suspend fun evaluate(
         intent: UserIntent,
         context: ArisContext,
         strategy: com.aris.voice.domain.Strategy,
@@ -508,29 +508,60 @@ class DecisionEngineImpl : IDecisionEngine {
             )
         }
         
-        if (strategy.type == com.aris.voice.domain.StrategyType.FALLBACK) {
-            return com.aris.voice.domain.Decision(
-                decisionId = UUID.randomUUID().toString(),
-                type = com.aris.voice.domain.DecisionType.USE_CLOUD_LLM,
-                reason = "Conversational input requires LLM fallback.",
-                confidence = intent.confidenceScore,
-                riskLevel = riskLevel,
-                canContinue = false,
-                plan = plan
-            )
-        }
-        
-        if (intent.confidenceScore < 0.5f) {
-            return com.aris.voice.domain.Decision(
-                decisionId = UUID.randomUUID().toString(),
-                type = com.aris.voice.domain.DecisionType.ASK_FOR_CLARIFICATION,
-                reason = "Low confidence in user intent.",
-                confidence = intent.confidenceScore,
-                riskLevel = riskLevel,
-                clarificationQuestion = "I'm not sure I understood completely. Could you clarify what you want to do?",
-                canContinue = false,
-                plan = plan
-            )
+        if (strategy.type == com.aris.voice.domain.StrategyType.FALLBACK || intent.confidenceScore < 0.5f) {
+            val llmBridge = com.aris.voice.di.ArisServiceRegistry.getOrNull(com.aris.voice.llm.ILlmBridge::class.java)
+            var isAmbiguousExecution = false
+            
+            if (llmBridge != null) {
+                val prompt = """
+                    Classify the following user input into either 'CONVERSATIONAL' or 'AMBIGUOUS_EXECUTION'.
+                    - 'CONVERSATIONAL': General chatting, greetings, questions, asking for jokes or facts (e.g., "Hello", "How are you", "Who are you", "Tell me a joke", "Explain AI").
+                    - 'AMBIGUOUS_EXECUTION': A command to perform an action on the device but missing necessary parameters to execute safely (e.g., "Delete that", "Open it", "Turn it off", "Call him", "Send the message").
+                    
+                    Input: "${intent.rawInput}"
+                    
+                    Respond with EXACTLY ONE WORD: either CONVERSATIONAL or AMBIGUOUS_EXECUTION.
+                """.trimIndent()
+                
+                val classificationRequest = com.aris.voice.domain.LlmRequest(
+                    prompt = prompt,
+                    temperature = 0.0f,
+                    classification = com.aris.voice.domain.LlmRequestClassification.REASONING
+                )
+                
+                val response = llmBridge.execute(classificationRequest)
+                if (response is com.aris.voice.core.ArisResult.Success) {
+                    val responseText = response.value.content.trim().uppercase()
+                    isAmbiguousExecution = responseText.contains("AMBIGUOUS_EXECUTION")
+                }
+            } else {
+                // If LLM is unavailable, fallback to a stricter evaluation
+                val actionVerbs = listOf("open", "delete", "turn", "call", "send", "remove", "close", "start", "stop")
+                isAmbiguousExecution = actionVerbs.any { intent.rawInput.lowercase().contains(it) }
+            }
+
+            if (isAmbiguousExecution) {
+                return com.aris.voice.domain.Decision(
+                    decisionId = UUID.randomUUID().toString(),
+                    type = com.aris.voice.domain.DecisionType.ASK_FOR_CLARIFICATION,
+                    reason = "Ambiguous execution request detected. User intent is unclear.",
+                    confidence = intent.confidenceScore,
+                    riskLevel = riskLevel,
+                    clarificationQuestion = "I'm not sure what exactly you want me to do. Could you please clarify?",
+                    canContinue = false,
+                    plan = plan
+                )
+            } else {
+                return com.aris.voice.domain.Decision(
+                    decisionId = UUID.randomUUID().toString(),
+                    type = com.aris.voice.domain.DecisionType.USE_CLOUD_LLM,
+                    reason = "Conversational input requires LLM fallback.",
+                    confidence = intent.confidenceScore,
+                    riskLevel = riskLevel,
+                    canContinue = false,
+                    plan = plan
+                )
+            }
         }
         
         return com.aris.voice.domain.Decision(

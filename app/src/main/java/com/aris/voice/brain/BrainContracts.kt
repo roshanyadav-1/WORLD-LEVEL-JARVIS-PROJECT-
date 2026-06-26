@@ -71,7 +71,7 @@ interface IToolSelector {
  * Interface to construct and sign-off the final, immutable Decision object.
  */
 interface IDecisionEngine {
-    fun evaluate(
+    suspend fun evaluate(
         intent: UserIntent,
         context: ArisContext,
         strategy: com.aris.voice.domain.Strategy,
