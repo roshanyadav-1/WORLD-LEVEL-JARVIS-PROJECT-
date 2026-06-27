@@ -15,10 +15,12 @@ class NavigationCapability : DeviceCapability {
     )
     
     override fun execute(context: Context, command: String, match: MatchResult): CommandResult {
+        val lower = command.lowercase()
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=navigation"))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
-        return CommandResult(true, "Opening Maps")
+        val hasDestination = lower.contains(" to ") || lower.contains(" for ")
+        return CommandResult(true, "Opening Maps", isGoalCompleted = !hasDestination)
     }
 }
 

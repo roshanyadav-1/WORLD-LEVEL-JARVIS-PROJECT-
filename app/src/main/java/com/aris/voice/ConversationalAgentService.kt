@@ -578,10 +578,22 @@ class ConversationalAgentService : Service() {
                         conversationHistory = addResponse("model", msg, conversationHistory)
                     }
                     
-                    // Since most offline commands open a new activity (alarms, phone, settings, apps),
-                    // we should gracefully shutdown the assistant overlay so the user can interact with the app.
-                    gracefulShutdown(msg, "offline_command_executed")
-                    return@launch
+                    if (offlineResult.isGoalCompleted) {
+                        // The command was fully resolved by the deterministic engine.
+                        gracefulShutdown(msg, "offline_command_executed")
+                        return@launch
+                    } else {
+                        // The engine performed an initial setup step (e.g. opening an app or panel),
+                        // but the user's intent is a multi-step goal. Hand off to Cognitive Runtime.
+                        Log.d("ConvAgent", "Deterministic step completed. Goal continues via AgentService.")
+                        
+                        // We do not want `gracefulShutdown` to trigger `performHome()` here, 
+                        // because we want to preserve the app state we just opened!
+                        // So we use a special endReason.
+                        com.aris.voice.v2.AgentService.start(applicationContext, userInput)
+                        gracefulShutdown(msg, "handoff_to_agent")
+                        return@launch
+                    }
                 }
                 // --- END NEW ---
 

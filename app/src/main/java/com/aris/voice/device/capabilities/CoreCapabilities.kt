@@ -58,23 +58,27 @@ class AppLaunchCapability : DeviceCapability {
     )
     
     override fun execute(context: Context, command: String, match: MatchResult): CommandResult {
-        val appName = match.groupValues[2].trim()
+        val appNameQuery = match.groupValues[2].trim()
         val resolver = AppLauncherResolver(context)
-        return when (val res = resolver.resolveApp(appName)) {
+        return when (val res = resolver.resolveApp(appNameQuery)) {
             is AppResolutionResult.Success -> {
+                // If there's significant extra text beyond the app name, it's a multi-step goal
+                val appLabel = res.appLabel.lowercase()
+                val extraText = appNameQuery.lowercase().replaceFirst(appLabel, "").trim()
+                val isMultiStep = extraText.isNotEmpty() && extraText.length > 3
+
                 val intent = context.packageManager.getLaunchIntentForPackage(res.packageName)
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val launchContext = ScreenInteractionService.instance ?: context
                     launchContext.startActivity(intent)
-                    CommandResult(true, "Opening ${res.appLabel}")
+                    CommandResult(true, "Opening ${res.appLabel}", isGoalCompleted = !isMultiStep)
                 } else {
                     CommandResult(false)
                 }
             }
             is AppResolutionResult.Ambiguous -> {
-                val apps = res.candidates.joinToString(" or ") { it.label }
-                CommandResult(true, "I found multiple apps matching '$appName': $apps. Which one would you like to open?")
+                CommandResult(true, "I found multiple apps. Which one?", isGoalCompleted = true)
             }
             is AppResolutionResult.NotFound -> {
                 CommandResult(false)
@@ -93,6 +97,7 @@ class CommunicationCapability : DeviceCapability {
     override fun execute(context: Context, command: String, match: MatchResult): CommandResult {
         val action = match.groupValues[1].lowercase()
         val target = match.groupValues[2].trim()
+        val isMultiStep = target.isNotEmpty()
         
         if (action in listOf("call", "dial", "phone")) {
             val numberRegex = Regex("\\d{8,15}")
@@ -101,18 +106,18 @@ class CommunicationCapability : DeviceCapability {
                 val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${numMatch.value}"))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
-                CommandResult(true, "Dialing ${numMatch.value}")
+                CommandResult(true, "Dialing ${numMatch.value}", isGoalCompleted = !isMultiStep)
             } else {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
-                CommandResult(true, "Opening your phone dialer")
+                CommandResult(true, "Opening your phone dialer", isGoalCompleted = !isMultiStep)
             }
         } else {
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
-            return CommandResult(true, "Opening message client")
+            return CommandResult(true, "Opening message client", isGoalCompleted = !isMultiStep)
         }
     }
 }

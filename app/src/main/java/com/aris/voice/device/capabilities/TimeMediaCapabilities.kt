@@ -28,7 +28,8 @@ class TimeAndAlarmCapability : DeviceCapability {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
-            return CommandResult(true, "Opening your device alarm database.")
+            val isExplicitSet = lower.contains("set") || lower.contains("for") || lower.contains("am") || lower.contains("pm")
+            return CommandResult(true, "Opening your device alarm database.", isGoalCompleted = !isExplicitSet)
         }
         
         if (lower.contains("timer")) {
@@ -37,7 +38,8 @@ class TimeAndAlarmCapability : DeviceCapability {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
-            return CommandResult(true, "Opening clock timers.")
+            val isExplicitSet = lower.contains("set") || lower.contains("for")
+            return CommandResult(true, "Opening clock timers.", isGoalCompleted = !isExplicitSet)
         }
         
         if (lower.contains("time") || lower.contains("samay")) {

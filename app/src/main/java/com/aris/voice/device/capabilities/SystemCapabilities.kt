@@ -46,10 +46,12 @@ class SystemSettingsCapability : DeviceCapability {
             else -> return CommandResult(false)
         }
         
+        val isExplicitStateChange = turnOn || lower.contains("turn off") || lower.contains("disable")
+        
         return try {
             val intent = Intent(action).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             context.startActivity(intent)
-            CommandResult(true, "Opening $speech.")
+            CommandResult(true, "Opening $speech.", isGoalCompleted = !isExplicitStateChange)
         } catch (e: Exception) {
             CommandResult(true, "Unable to open $speech.")
         }
