@@ -564,8 +564,8 @@ class ConversationalAgentService : Service() {
                 }
 
                 // --- NEW: Offline Command Processing (No LLM required) ---
-                val offlineProcessor = com.aris.voice.utilities.OfflineCommandProcessor(this@ConversationalAgentService)
-                val offlineResult = offlineProcessor.processCommandOffline(userInput)
+                val offlineProcessor = com.aris.voice.device.DeviceIntelligenceEngine(this@ConversationalAgentService)
+                val offlineResult = offlineProcessor.processCommand(userInput)
                 if (offlineResult.isHandled) {
                     val msg = offlineResult.feedbackSpeech ?: "Done."
                     val offlineBundle = android.os.Bundle().apply {

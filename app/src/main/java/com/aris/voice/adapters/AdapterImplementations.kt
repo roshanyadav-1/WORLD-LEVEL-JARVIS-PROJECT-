@@ -10,7 +10,7 @@ import com.aris.voice.domain.LlmFinishReason
 import com.aris.voice.llm.ILlmProvider
 import com.aris.voice.utilities.TTSManager
 import com.aris.voice.utilities.STTManager
-import com.aris.voice.utilities.OfflineCommandProcessor
+import com.aris.voice.device.DeviceIntelligenceEngine
 import com.aris.voice.triggers.TriggerManager
 
 class VoiceAdapterImpl(private val context: Context) : IVoiceAdapter {
@@ -33,7 +33,7 @@ class ActionAdapterImpl(
     private val context: Context,
     private val finger: com.aris.voice.api.Finger
 ) : IActionAdapter {
-    private val processor = OfflineCommandProcessor(context)
+    private val processor = DeviceIntelligenceEngine(context)
     
     override suspend fun executeAction(action: String, params: Map<String, Any>): ArisResult<Any> {
         return try {
@@ -86,14 +86,14 @@ class ActionAdapterImpl(
                     ArisResult.Success("Performed system Recents action")
                 }
                 "NOTIFICATIONS" -> {
-                    processor.processCommandOffline("notification panel")
+                    processor.processCommand("notification panel")
                     ArisResult.Success("Opened notification panel")
                 }
                 "TOGGLE_SETTING" -> {
                     val settingKey = params["settingKey"]?.toString() ?: ""
                     val enable = params["enable"] as? Boolean ?: true
                     val command = if (enable) "turn on $settingKey" else "turn off $settingKey"
-                    val result = processor.processCommandOffline(command)
+                    val result = processor.processCommand(command)
                     if (result.isHandled) {
                         ArisResult.Success(result.feedbackSpeech ?: "Toggled setting $settingKey")
                     } else {
@@ -102,7 +102,7 @@ class ActionAdapterImpl(
                 }
                 "CONTROL_MEDIA" -> {
                     val command = params["command"]?.toString() ?: ""
-                    val result = processor.processCommandOffline(command)
+                    val result = processor.processCommand(command)
                     if (result.isHandled) {
                         ArisResult.Success(result.feedbackSpeech ?: "Controlled media with $command")
                     } else {
@@ -152,7 +152,7 @@ class ActionAdapterImpl(
                 }
                 else -> {
                     // Fallback to offline command processor
-                    val result = processor.processCommandOffline(action)
+                    val result = processor.processCommand(action)
                     if (result.isHandled) {
                         ArisResult.Success(result.feedbackSpeech ?: "Action handled successfully")
                     } else {
