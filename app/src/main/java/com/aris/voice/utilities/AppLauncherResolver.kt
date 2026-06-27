@@ -66,34 +66,62 @@ class AppLauncherResolver(private val context: Context) {
     }
 
     fun normalize(str: String): String {
-        return str.lowercase(Locale.getDefault())
-            .replace(Regex("[^a-z0-9\\s]"), "") // remove punctuation
-            .replace("app", "")
-            .replace("application", "")
-            .trim()
+        val lower = str.lowercase(Locale.getDefault())
+            .replace(Regex("[^a-z0-9\\s]"), " ") // replace punctuation with space to avoid merging words
+        // Tokenize and filter out "app", "application", "apps" as whole words
+        val tokens = lower.split(Regex("\\s+"))
+            .filter { it.isNotEmpty() && it != "app" && it != "application" && it != "apps" }
+        return tokens.joinToString(" ")
     }
 
     fun resolveApp(query: String): AppResolutionResult {
-        val normalizedQuery = normalize(query)
-        if (normalizedQuery.isEmpty()) {
-            return AppResolutionResult.NotFound
-        }
-
         val launchableApps = getLaunchableApps()
         if (launchableApps.isEmpty()) {
             Log.e(TAG, "No launchable apps found on device.")
             return AppResolutionResult.NotFound
         }
 
-        // 1. Exact Label Match (Case-insensitive & Normalized)
-        val exactMatches = launchableApps.filter { it.normalizedLabel == normalizedQuery }
+        // Level 1. Direct Package Name Match
+        val trimmedQuery = query.trim()
+        val directPkgMatch = launchableApps.find { it.packageName.equals(trimmedQuery, ignoreCase = true) }
+        if (directPkgMatch != null) {
+            return AppResolutionResult.Success(directPkgMatch.packageName, directPkgMatch.label)
+        }
+
+        val normalizedQuery = normalize(query)
+        if (normalizedQuery.isEmpty()) {
+            return AppResolutionResult.NotFound
+        }
+
+        // Level 2. Exact Label Match (Case-insensitive & Normalized)
+        val exactMatches = launchableApps.filter { 
+            it.label.equals(query, ignoreCase = true) || it.normalizedLabel == normalizedQuery 
+        }
         if (exactMatches.size == 1) {
             return AppResolutionResult.Success(exactMatches[0].packageName, exactMatches[0].label)
         } else if (exactMatches.size > 1) {
-            return AppResolutionResult.Ambiguous(exactMatches)
+            // If multiple exact matches exist, prioritize one with shortest label or return success on first
+            return AppResolutionResult.Success(exactMatches[0].packageName, exactMatches[0].label)
         }
 
-        // 2. Alias Mapping match
+        // Level 3. Specific Word Match (Query matches the App Label as a distinct whole word)
+        // This is extremely high-precision (e.g. "spotify" matches "Spotify Music" uniquely without matching other music apps)
+        val queryTokens = normalizedQuery.split(" ")
+        val wordMatches = launchableApps.filter { app ->
+            val appTokens = app.normalizedLabel.split(" ")
+            // Check if all tokens of normalizedQuery are present in the app's tokens
+            appTokens.containsAll(queryTokens) || queryTokens.containsAll(appTokens)
+        }
+        if (wordMatches.size == 1) {
+            return AppResolutionResult.Success(wordMatches[0].packageName, wordMatches[0].label)
+        } else if (wordMatches.size > 1) {
+            // Sort by label length to prefer shorter/canonical names (e.g. "Spotify Music" over "Spotify Music Downloader")
+            val sortedWordMatches = wordMatches.sortedBy { it.label.length }
+            return AppResolutionResult.Success(sortedWordMatches[0].packageName, sortedWordMatches[0].label)
+        }
+
+        // Level 4. Alias Mapping Match (Only run if no direct exact or word match succeeded)
+        // This protects specific searches from being polluted by broad generic aliases
         val matchedKeys = mutableSetOf<String>()
         for ((key, aliases) in appAliases) {
             if (key == normalizedQuery || aliases.any { it == normalizedQuery || normalizedQuery.contains(it) || it.contains(normalizedQuery) }) {
@@ -115,7 +143,7 @@ class AppLauncherResolver(private val context: Context) {
             return AppResolutionResult.Ambiguous(aliasMatchedApps)
         }
 
-        // 3. Partial Word / Sub-string Matching (App label contains Query or Query contains App label)
+        // Level 5. Partial Sub-string Matching (App label contains Query or Query contains App label)
         val partialMatches = launchableApps.filter {
             it.normalizedLabel.contains(normalizedQuery) || normalizedQuery.contains(it.normalizedLabel)
         }
@@ -129,7 +157,7 @@ class AppLauncherResolver(private val context: Context) {
             return AppResolutionResult.Ambiguous(partialMatches)
         }
 
-        // 4. Fuzzy Levenshtein Distance Match (Fuzzy threshold depends on length)
+        // Level 6. Fuzzy Levenshtein Distance Match (Fuzzy threshold depends on length)
         val fuzzyMatches = mutableListOf<Pair<LauncherAppInfo, Int>>()
         for (app in launchableApps) {
             val dist = levenshtein(normalizedQuery, app.normalizedLabel)

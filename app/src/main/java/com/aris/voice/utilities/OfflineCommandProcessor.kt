@@ -185,7 +185,8 @@ class OfflineCommandProcessor(private val context: Context) {
                 val intent = pm.getLaunchIntentForPackage(res.packageName)
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
+                    val launchContext = com.aris.voice.ScreenInteractionService.instance ?: context
+                    launchContext.startActivity(intent)
                     CommandResult(true, "Opening $cleanName")
                 } else {
                     CommandResult(false)
@@ -210,7 +211,8 @@ class OfflineCommandProcessor(private val context: Context) {
                 val intent = pm.getLaunchIntentForPackage(res.packageName)
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
+                    val launchContext = com.aris.voice.ScreenInteractionService.instance ?: context
+                    launchContext.startActivity(intent)
                     CommandResult(true, "Sure, opening ${res.appLabel}.")
                 } else {
                     CommandResult(false)

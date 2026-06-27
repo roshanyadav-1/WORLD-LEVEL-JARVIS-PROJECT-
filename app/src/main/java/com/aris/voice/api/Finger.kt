@@ -40,7 +40,8 @@ class Finger(private val context: Context) {
             
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+                val launchContext = service ?: context
+                launchContext.startActivity(intent)
                 Log.d(TAG, "Successfully launched app: $packageName")
                 true
             } else {

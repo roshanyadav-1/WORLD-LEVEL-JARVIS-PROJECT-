@@ -65,6 +65,19 @@ class ActionExecutor(private val finger: Finger) {
     }
 
     private fun findPackageNameFromAppName(appName: String, context: Context): String? {
+        val resolver = com.aris.voice.utilities.AppLauncherResolver(context)
+        when (val res = resolver.resolveApp(appName)) {
+            is com.aris.voice.utilities.AppResolutionResult.Success -> {
+                return res.packageName
+            }
+            is com.aris.voice.utilities.AppResolutionResult.Ambiguous -> {
+                if (res.candidates.isNotEmpty()) {
+                    return res.candidates.first().packageName
+                }
+            }
+            else -> {}
+        }
+
         val pm = context.packageManager
         val packages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getInstalledApplications(PackageManager.ApplicationInfoFlags.of(0L))
